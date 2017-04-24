@@ -14,22 +14,26 @@ var simulation = d3.forceSimulation()
         .force("charge", manyBody)
         .force("center", d3.forceCenter(svg_width/2, svg_height/2));
 
-  var nodes = []
+
+   
+d3.json('MOCK_DATA.json', function(error, data) {
+    if (error) throw error;
+  //var n = 1;
+    var nodes = []
     var links = []
-    
-d3.json('MOCK_DATA.json', function(data) {
-  
+    //var mock = {nodes, links};
     for(row of data) {
-        nodes.push({"word": row.Word, "frequency":row.Frequency});
-        links.push({"source": "test", "target": row.Word, "value": row.Similarity});
         
+        nodes.push({"word": row.Word, "frequency":row.Frequency});
+       links.push({"source": "Test", "target":row.Word, "value":row.Similarity});
+        //n  = n + 1;
     }
-    console.log(nodes);
-    console.log(links);
-})
-
-
-var link = svg.append("g")
+    nodes.push({"word": "Test", "frequency": 0.6});
+   // console.log(mock);
+  //  console.log(nodes);
+    //console.log(links);*/
+    
+    var link = svg.append("g")
             .attr("class", "links")
             .selectAll("line")
             .data(links)
@@ -38,27 +42,22 @@ var link = svg.append("g")
 
 var node = svg.append("g")
                 .attr("class", "nodes")
-                .selectAll("rect")
+                .selectAll("circle")
                 .data(nodes)
-                .enter().append("rect")
-                .attr("width", function(d) {return d.frequency*10;})
-                .attr("height", function(d) {return d.frequency*10;})
+                .enter().append("circle")
+                .attr("r", 5)
                 .attr("fill", "red")
-                .call(d3.drag()
+                    .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
                     .on("end", dragended));
-
-  
-
-  
   simulation.nodes(nodes)
     .on("tick", ticked);
 
   simulation.force("link")
     .links(links);
 
-  function ticked() {
+    function ticked() {
     link
       .attr("x1", d => d.source.x )
       .attr("y1", d => d.source.y )
@@ -69,6 +68,12 @@ var node = svg.append("g")
       .attr("cx", d => d.x )
       .attr("cy", d => d.y );
   }
+      
+
+  
+});
+
+
 
 
 function dragstarted(d) {
