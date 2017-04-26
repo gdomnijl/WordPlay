@@ -7,16 +7,19 @@ var svg = d3.select('body').append('svg')
             .attr('height', svg_height)
 
 var manyBody = d3.forceManyBody()
-             .strength(-5);
+                 //.strength();
 var collide = d3.forceCollide([1]);
+var flink = d3.forceLink();
+//flink.distance()
 var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(d => d.word))
+        .force("link", flink.id(d => d.word))
+                            //.distance())
         .force("charge", manyBody)
         .force("center", d3.forceCenter(svg_width/2, svg_height/2));
-
-var colorscale = d3.scaleLog()
+/* var colorscale = d3.scaleLog()
                      .domain([Math.min(...nonEmptyCounts), Math.max(...nonEmptyCounts)])
                      .range(["#e5f5f9", "#2ca25f"]);
+                     */
 var nodes = []
 var links = []
    
@@ -26,33 +29,34 @@ d3.queue()
    //  var n = 1;
     
     //var mock = {nodes, links};
-    for(row of data) {
+    for(var i = 0; i < 20; i++) {
         
         nodes.push({//"id": n,
-            "word": row.Word, "frequency":parseFloat(row.Frequency)});
-       links.push({"source": "Test", "target":row.Word, "value":parseFloat(row.Similarity)});
-     //   n  = n + 1;
+            "word": data[i].Word, "frequency":parseFloat(data[i].Frequency)});
+       links.push({"source": "Test", "target":data[i].Word, "value":parseFloat(data[i].Similarity)});
     }
     nodes.push({"word": "Test", "frequency": 0.6});
-   // console.log(mock);
-  //  console.log(nodes);
-    //console.log(links);*/
+
     
+
     var link = svg.append("g")
             .attr("class", "links")
             .selectAll("line")
             .data(links)
             .enter().append("line")
-            .attr("stroke-width", function(d){return 2*d.value})
-            .attr("fill", "blue"); 
+    //The more similar the words are, the thicker the links
+            .attr("stroke-width", function(d){return 5*d.value + 1})
+            .attr("stroke", "blue"); 
 
     var node = svg.append("g")
                 .attr("class", "nodes")
                 .selectAll("circle")
                 .data(nodes)
                 .enter().append("circle")
-                .attr("r", function(d) {return d.frequency * 5})
-                .attr("fill", function(d) {return colorscale(d.frequency).darker})
+                .attr("id", d => d.word)
+    //The more frequent a word is, the bigger it is
+                .attr("r", function(d) {return d.frequency * 5 + 5})
+                .attr("fill", "red")
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
@@ -61,9 +65,10 @@ d3.queue()
     .on("tick", ticked);
 
     simulation.force("link")
-    .links(links);
-
-    //forceCollide(1);
+    .links(links)
+    
+    //The more similar the words, the closer they are
+    .distance(d => 50*(1-d.value) + 50);
     
     function ticked() {
     link
@@ -75,8 +80,6 @@ d3.queue()
     node
       .attr("cx", d => d.x )
       .attr("cy", d => d.y );
-        
-        //node.each(collide(0.5));
   }
 })
 
