@@ -22,19 +22,17 @@ var nodes = []
 var links = []
    
 d3.queue()
-.defer(d3.json, 'MOCK_DATA.json')
+.defer(d3.json, 'MOCK_DATA2.json')
 .await(function(error,data){
-  
-    for(var i = 0; i < 20; i++) {
+d3.json("MOCK_DATA2.json", function(data){
+   for(row of data) {
         
-        nodes.push({//"id": n,
-            "word": data[i].Word, "frequency":parseFloat(data[i].Frequency)});
-       links.push({"source": "Test", "target":data[i].Word, "value":parseFloat(data[i].Similarity)});
+        nodes.push({
+            "word": row.Word, "frequency":parseFloat(row.Frequency)});
+       links.push({"source": row.Word, "target":row.Related, "value":parseFloat(row.Similarity)});
     }
-    nodes.push({"word": "Test", "frequency": 0.6});
 
     
-
     var link = svg.append("g")
             .attr("class", "links")
             .selectAll("line")
