@@ -1,4 +1,3 @@
-
 var svg_width  = 800;
 var svg_height = 600;
 
@@ -9,26 +8,23 @@ var svg = d3.select('body').append('svg')
 var manyBody = d3.forceManyBody()
                  //.strength();
 var collide = d3.forceCollide([1]);
-var flink = d3.forceLink();
-//flink.distance()
 var simulation = d3.forceSimulation()
-        .force("link", flink.id(d => d.word))
+        .force("link", d3.forceLink().id(d => d.word))
                             //.distance())
         .force("charge", manyBody)
         .force("center", d3.forceCenter(svg_width/2, svg_height/2));
-/* var colorscale = d3.scaleLog()
-                     .domain([Math.min(...nonEmptyCounts), Math.max(...nonEmptyCounts)])
+
+var colorscale = d3.scaleLinear()
+                    .domain([0, 20])
                      .range(["#e5f5f9", "#2ca25f"]);
-                     */
+                     
 var nodes = []
 var links = []
    
 d3.queue()
 .defer(d3.json, 'MOCK_DATA.json')
 .await(function(error,data){
-   //  var n = 1;
-    
-    //var mock = {nodes, links};
+  
     for(var i = 0; i < 20; i++) {
         
         nodes.push({//"id": n,
@@ -45,8 +41,8 @@ d3.queue()
             .data(links)
             .enter().append("line")
     //The more similar the words are, the thicker the links
-            .attr("stroke-width", function(d){return 5*d.value + 1})
-            .attr("stroke", "blue"); 
+            .attr("stroke-width", d=> 5*d.value + 1)
+            .attr("stroke", d => colorscale(d.value*10 +5)); 
 
     var node = svg.append("g")
                 .attr("class", "nodes")
@@ -56,7 +52,7 @@ d3.queue()
                 .attr("id", d => d.word)
     //The more frequent a word is, the bigger it is
                 .attr("r", function(d) {return d.frequency * 5 + 5})
-                .attr("fill", "red")
+                .attr("fill", d => colorscale(d.frequency*10 + 5))
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
