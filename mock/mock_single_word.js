@@ -4,9 +4,10 @@ var svg_height = 800;
 var svg = d3.select('body').append('svg')
             .attr('width', svg_width)
             .attr('height', svg_height)
+            .attr("class", "graph-svg-component");
 
 var manyBody = d3.forceManyBody()
-                 //.strength();
+                 .strength(-100);
 //var collide = d3.forceCollide([1]);
 var simulation = d3.forceSimulation()
         .force("link", d3.forceLink().id(d => d.word))
@@ -29,6 +30,10 @@ var NUM_NEIGHBOR = 10;
 var nodes = []
 var nodeSet = new Set([]);
 var links = []
+var focus_node = null;
+var highlight_node = null;
+var highlight_color = "blue";
+var default_link_color = "#888";
 
 function addToGraph(data, index){
     
@@ -101,13 +106,13 @@ d3.queue()
     //Step 2: After nodes/links are filled in
     //Set up colorScale and sizeScale according to the max and min
     
-    //Getting just the value arrays
+    //Extracting just the value arrays
     var values = links.map(function(a) {return a.value;});
     
     var maxVal = Math.max(...values);
     var minVal = Math.min(...values);
     console.log(maxVal,minVal); 
-    var colorscale = d3.scaleLinear()
+    var colorScale = d3.scaleLinear()
                     .domain([minVal,maxVal])
                      .range(["#e5f5f9", "#2ca25f"]);
     var sizeScale = d3.scaleLinear()
@@ -122,26 +127,40 @@ d3.queue()
             .enter().append("line")
     //The more similar the words are, the thicker the links
             .attr("stroke-width", d=> sizeScale(d.value))
-            .attr("stroke", d => colorscale(d.value)); 
+            .attr("stroke", d => colorScale(d.value)); 
 
-    var node = svg.append("g")
-                .attr("class", "nodes")
-                .selectAll("circle")
+	
+     var node = svg.selectAll(".node")
                 .data(nodes)
-                .enter().append("circle")
+                .enter().append("g")
+                .attr("class", "nodes")
+                .append("circle")
                 .attr("id", d => d.word)
     //Arbitrarily setting node of size 10
                 .attr("r", 10)
                 .attr("fill", function(d,i){
-                    if(i == 1){ return "black"; } 
-                    else { return colorscale(0.5)}})
+                    if(i == 0){ return "black"; } 
+                    else { return colorScale(0.5)}})
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
                     .on("end", dragended))
-                    .on("click",connectedNodes);
-                   
-	
+                    .on("click",connectedNodes)
+                    .on("mouseover", function(d){
+                        set_highlight(d);
+                    })
+                    .on("mouseout", function(d){
+                        exit_highlight();
+                    })
+    
+    var text = svg.selectAll(".nodes")
+    .data(nodes)
+    .append("text")
+    .attr("dx",10)
+    .attr("dy", ".35em")
+    .text(function(d) { return d.word});
+    
+    
     
     simulation.nodes(nodes)
     .on("tick", ticked);
@@ -163,7 +182,64 @@ d3.queue()
       .attr("cx", d => d.x )
       .attr("cy", d => d.y );
         
+    ///// make the text moves with the node
+    d3.selectAll("text")
+      .attr("x", function (d) {
+        return d.x;})
+       .attr("y", function (d) {
+        return d.y;});      
     }
+    
+    function set_highlight(d){
+	   svg.style("cursor","pointer");
+	   if (focus_node!==null){
+           d = focus_node;
+       }
+        	highlight_node = d;
+
+	if (highlight_color!="white"){
+		  node.style("stroke", function(o) {
+                if (neighboring(d, o)) {
+                    return highlight_color;}});
+			text.style("font-weight", function(o) {
+                return neighboring(d, o) ? "bold" : "normal";});
+            link.style("stroke", function(o) {
+		      return o.source.index == d.index || o.target.index == d.index ? highlight_color : colorScale(o.value)})
+            }}
+	
+
+
+function exit_highlight(){
+		highlight_node = null;
+	if (focus_node===null){
+		svg.style("cursor","move");
+		if (highlight_color!="white"){
+  	       node.style("stroke", "white");
+	       text.style("font-weight", "normal");
+	       link.style("stroke", function(o) {return (/*isNumber(o.Similarity) && */ o.value>=0)?colorScale(o.value):default_link_color});
+        }
+			
+	}
+}
+ 
+
+
+
+
+    ////////Searchbox
+var optArray = [];
+for (var i = 0; i < nodes.length - 1; i++) {
+    optArray.push(nodes[i].word);
+}
+optArray = optArray.sort();
+
+
+$(function () {
+    $("#search").autocomplete({
+        source: optArray
+    });
+});
+
     
 /* Not working
 //**********Feature B: expel nodes beyond threshold
@@ -227,6 +303,9 @@ function restart() {
                 return d.index==o.source.index | d.index==o.target.index ? 1 : 0.05;
             });
 
+            text.style("opacity", function (o) {
+            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
+});
             //Reduce the op
 
             toggle = 1;
@@ -234,6 +313,7 @@ function restart() {
             //Put them back to opacity=1
             node.style("opacity", 1);
             link.style("opacity", 1);
+             text.style("opacity", 1);
             toggle = 0;
         }
 
@@ -257,3 +337,22 @@ function dragended(d) {
   d.fy = null;
 }
 
+//**************For Searchbox
+function searchNode() {
+    //find the node
+    var selectedVal = document.getElementById('search').value;
+    var node = svg.selectAll(".nodes");
+    if (selectedVal == "none") {
+        node.style("stroke", "white").style("stroke-width", "1");
+    } else {
+        var selected = node.filter(function (d, i) {
+            return d.word != selectedVal;
+        });
+        selected.style("opacity", "0");
+        var link = svg.selectAll(".links")
+        link.style("opacity", "0");
+        d3.selectAll(".nodes, .links").transition()
+            .duration(5000)
+            .style("opacity", 1);
+    }
+}
