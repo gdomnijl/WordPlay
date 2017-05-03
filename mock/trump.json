@@ -1,0 +1,532 @@
+[
+  {
+    "Source": "trump",
+    "Target": "obama",
+    "Similarity": "0.62784636"
+  },
+  {
+    "Source": "obama",
+    "Target": "reagan",
+    "Similarity": "0.720416546"
+  },
+  {
+    "Source": "obama",
+    "Target": "clinton",
+    "Similarity": "0.661075473"
+  },
+  {
+    "Source": "obama",
+    "Target": "barack",
+    "Similarity": "0.660931289"
+  },
+  {
+    "Source": "obama",
+    "Target": "nixon",
+    "Similarity": "0.63658607"
+  },
+  {
+    "Source": "obama",
+    "Target": "mccain",
+    "Similarity": "0.623258054"
+  },
+  {
+    "Source": "obama",
+    "Target": "bush",
+    "Similarity": "0.617334843"
+  },
+  {
+    "Source": "obama",
+    "Target": "putin",
+    "Similarity": "0.597032249"
+  },
+  {
+    "Source": "obama",
+    "Target": "ahmadinejad",
+    "Similarity": "0.579698741"
+  },
+  {
+    "Source": "obama",
+    "Target": "biden",
+    "Similarity": "0.579110265"
+  },
+  {
+    "Source": "trump",
+    "Target": "drumpf",
+    "Similarity": "0.546892822"
+  },
+  {
+    "Source": "drumpf",
+    "Target": "ramotar",
+    "Similarity": "0.592853606"
+  },
+  {
+    "Source": "drumpf",
+    "Target": "wrye",
+    "Similarity": "0.516521096"
+  },
+  {
+    "Source": "drumpf",
+    "Target": "swaelens",
+    "Similarity": "0.505039275"
+  },
+  {
+    "Source": "drumpf",
+    "Target": "difrancesco",
+    "Similarity": "0.50155592"
+  },
+  {
+    "Source": "drumpf",
+    "Target": "deskey",
+    "Similarity": "0.487976134"
+  },
+  {
+    "Source": "drumpf",
+    "Target": "rumsfeld",
+    "Similarity": "0.480896056"
+  },
+  {
+    "Source": "drumpf",
+    "Target": "carcieri",
+    "Similarity": "0.479807079"
+  },
+  {
+    "Source": "drumpf",
+    "Target": "wildmon",
+    "Similarity": "0.478774548"
+  },
+  {
+    "Source": "drumpf",
+    "Target": "tiripano",
+    "Similarity": "0.476980776"
+  },
+  {
+    "Source": "trump",
+    "Target": "rumsfeld",
+    "Similarity": "0.543486476"
+  },
+  {
+    "Source": "rumsfeld",
+    "Target": "keyhoe",
+    "Similarity": "0.595981836"
+  },
+  {
+    "Source": "rumsfeld",
+    "Target": "carcieri",
+    "Similarity": "0.567503929"
+  },
+  {
+    "Source": "rumsfeld",
+    "Target": "difrancesco",
+    "Similarity": "0.551731169"
+  },
+  {
+    "Source": "rumsfeld",
+    "Target": "segretti",
+    "Similarity": "0.549274862"
+  },
+  {
+    "Source": "rumsfeld",
+    "Target": "kuspit",
+    "Similarity": "0.548006117"
+  },
+  {
+    "Source": "rumsfeld",
+    "Target": "quataert",
+    "Similarity": "0.546682477"
+  },
+  {
+    "Source": "rumsfeld",
+    "Target": "verrilli",
+    "Similarity": "0.530256212"
+  },
+  {
+    "Source": "rumsfeld",
+    "Target": "spoto",
+    "Similarity": "0.528141022"
+  },
+  {
+    "Source": "rumsfeld",
+    "Target": "ramotar",
+    "Similarity": "0.527365625"
+  },
+  {
+    "Source": "trump",
+    "Target": "obamadonald",
+    "Similarity": "0.534412146"
+  },
+  {
+    "Source": "obamadonald",
+    "Target": "obamamost",
+    "Similarity": "0.567872167"
+  },
+  {
+    "Source": "obamadonald",
+    "Target": "obama",
+    "Similarity": "0.536965609"
+  },
+  {
+    "Source": "obamadonald",
+    "Target": "bushbarack",
+    "Similarity": "0.476154804"
+  },
+  {
+    "Source": "obamadonald",
+    "Target": "nfubea",
+    "Similarity": "0.471191823"
+  },
+  {
+    "Source": "obamadonald",
+    "Target": "unquotable",
+    "Similarity": "0.45739764"
+  },
+  {
+    "Source": "obamadonald",
+    "Target": "philadelph",
+    "Similarity": "0.450910985"
+  },
+  {
+    "Source": "obamadonald",
+    "Target": "drumpf",
+    "Similarity": "0.422944725"
+  },
+  {
+    "Source": "obamadonald",
+    "Target": "rajghatta",
+    "Similarity": "0.417783737"
+  },
+  {
+    "Source": "obamadonald",
+    "Target": "barack",
+    "Similarity": "0.416350365"
+  },
+  {
+    "Source": "trump",
+    "Target": "ramotar",
+    "Similarity": "0.522356033"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "tiripano",
+    "Similarity": "0.686386824"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "kalpokas",
+    "Similarity": "0.681731164"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "difrancesco",
+    "Similarity": "0.677634716"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "kaberuka",
+    "Similarity": "0.652974844"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "swaelens",
+    "Similarity": "0.652526855"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "havioyak",
+    "Similarity": "0.646550894"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "deskey",
+    "Similarity": "0.632011294"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "wrye",
+    "Similarity": "0.630821466"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "carcieri",
+    "Similarity": "0.628348827"
+  },
+  {
+    "Source": "ramotar",
+    "Target": "runnicles",
+    "Similarity": "0.628319502"
+  },
+  {
+    "Source": "trump",
+    "Target": "mccain",
+    "Similarity": "0.511515141"
+  },
+  {
+    "Source": "mccain",
+    "Target": "kasich",
+    "Similarity": "0.71551919"
+  },
+  {
+    "Source": "mccain",
+    "Target": "sununu",
+    "Similarity": "0.670033216"
+  },
+  {
+    "Source": "mccain",
+    "Target": "cornyn",
+    "Similarity": "0.647938669"
+  },
+  {
+    "Source": "mccain",
+    "Target": "boehner",
+    "Similarity": "0.624385417"
+  },
+  {
+    "Source": "mccain",
+    "Target": "obama",
+    "Similarity": "0.623258054"
+  },
+  {
+    "Source": "mccain",
+    "Target": "hostettler",
+    "Similarity": "0.612101972"
+  },
+  {
+    "Source": "mccain",
+    "Target": "yarmuth",
+    "Similarity": "0.605155945"
+  },
+  {
+    "Source": "mccain",
+    "Target": "huckabee",
+    "Similarity": "0.604990959"
+  },
+  {
+    "Source": "mccain",
+    "Target": "boozman",
+    "Similarity": "0.60490787"
+  },
+  {
+    "Source": "mccain",
+    "Target": "chafee",
+    "Similarity": "0.600763202"
+  },
+  {
+    "Source": "trump",
+    "Target": "reagan",
+    "Similarity": "0.506039381"
+  },
+  {
+    "Source": "reagan",
+    "Target": "obama",
+    "Similarity": "0.720416546"
+  },
+  {
+    "Source": "reagan",
+    "Target": "nixon",
+    "Similarity": "0.685536206"
+  },
+  {
+    "Source": "reagan",
+    "Target": "machtley",
+    "Similarity": "0.644668221"
+  },
+  {
+    "Source": "reagan",
+    "Target": "truman",
+    "Similarity": "0.628557324"
+  },
+  {
+    "Source": "reagan",
+    "Target": "eisenhower",
+    "Similarity": "0.61441052"
+  },
+  {
+    "Source": "reagan",
+    "Target": "roosevelt",
+    "Similarity": "0.595315874"
+  },
+  {
+    "Source": "reagan",
+    "Target": "clinton",
+    "Similarity": "0.591198444"
+  },
+  {
+    "Source": "reagan",
+    "Target": "kiandee",
+    "Similarity": "0.583823144"
+  },
+  {
+    "Source": "reagan",
+    "Target": "pofalla",
+    "Similarity": "0.575437069"
+  },
+  {
+    "Source": "reagan",
+    "Target": "depinho",
+    "Similarity": "0.573009133"
+  },
+  {
+    "Source": "trump",
+    "Target": "difrancesco",
+    "Similarity": "0.501830876"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "carcieri",
+    "Similarity": "0.741079569"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "manzullo",
+    "Similarity": "0.713445663"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "albosta",
+    "Similarity": "0.698321164"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "ramotar",
+    "Similarity": "0.677634716"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "mceachin",
+    "Similarity": "0.665435731"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "tiripano",
+    "Similarity": "0.656781793"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "kettl",
+    "Similarity": "0.654616237"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "wrye",
+    "Similarity": "0.650338411"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "runnicles",
+    "Similarity": "0.6492064"
+  },
+  {
+    "Source": "difrancesco",
+    "Target": "havioyak",
+    "Similarity": "0.642967701"
+  },
+  {
+    "Source": "trump",
+    "Target": "carcieri",
+    "Similarity": "0.500848353"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "difrancesco",
+    "Similarity": "0.741079569"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "manzullo",
+    "Similarity": "0.667579055"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "ramotar",
+    "Similarity": "0.628348827"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "kettl",
+    "Similarity": "0.617387176"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "albosta",
+    "Similarity": "0.616314471"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "etiebet",
+    "Similarity": "0.586184382"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "verrilli",
+    "Similarity": "0.583941698"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "wrye",
+    "Similarity": "0.577619016"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "quataert",
+    "Similarity": "0.574354649"
+  },
+  {
+    "Source": "carcieri",
+    "Target": "havioyak",
+    "Similarity": "0.572547317"
+  },
+  {
+    "Source": "trump",
+    "Target": "putin",
+    "Similarity": "0.483127594"
+  },
+  {
+    "Source": "putin",
+    "Target": "medvedev",
+    "Similarity": "0.739267707"
+  },
+  {
+    "Source": "putin",
+    "Target": "yeltsin",
+    "Similarity": "0.728437901"
+  },
+  {
+    "Source": "putin",
+    "Target": "gorbachev",
+    "Similarity": "0.693802953"
+  },
+  {
+    "Source": "putin",
+    "Target": "lukashenko",
+    "Similarity": "0.673844278"
+  },
+  {
+    "Source": "putin",
+    "Target": "ahmadinejad",
+    "Similarity": "0.668079257"
+  },
+  {
+    "Source": "putin",
+    "Target": "yushchenko",
+    "Similarity": "0.667038321"
+  },
+  {
+    "Source": "putin",
+    "Target": "yanukovych",
+    "Similarity": "0.663871884"
+  },
+  {
+    "Source": "putin",
+    "Target": "saakashvili",
+    "Similarity": "0.650162458"
+  },
+  {
+    "Source": "putin",
+    "Target": "zhirinovsky",
+    "Similarity": "0.636763811"
+  },
+  {
+    "Source": "putin",
+    "Target": "sarkozy",
+    "Similarity": "0.613301516"
+  }
+]

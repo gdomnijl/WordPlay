@@ -52,7 +52,7 @@ d3.queue()
 .defer(d3.json, 'MOCK_DATA.json')
 .await(function(error,data){
     
-    var indexSoFar = 0;
+   var indexSoFar = 0;
    // indexRecord.push(0);
    var numNode1 = NUM_NEIGHBOR; //randomWholeNum(20,1);
 
@@ -124,13 +124,15 @@ d3.queue()
     for(var i = indexSoFar; i < indexSoFar + numNode4D; i++) {
        addToGraph(i,data,subnodeD);
     }
+
+
     indexRecord.push(indexRecord[indexRecord.length-1] + numNode4D);
     indexSoFar = indexSoFar + numNode4D;
     console.log("forth layer sofar: "+ indexRecord);
 
     
     //Fifth layer from subnode ACDE:
-      var numNode5E = NUM_NEIGHBOR;
+    var numNode5E = NUM_NEIGHBOR;
     console.log("subnodeE:")
     var subnodeE = randomWholeNum(numNode5E,indexRecord[indexRecord.length-1]);
     
@@ -166,7 +168,17 @@ d3.queue()
                     .on("start", dragstarted)
                     .on("drag", dragged)
                     .on("end", dragended))
-                    .on("click",connectedNodes);
+                    .on("click",connectedNodes)
+                    .on("dblclick.zoom", function(d) { d3.event.stopPropagation();
+	var dcx = (window.innerWidth/2-d.x*zoom.scale());
+	var dcy = (window.innerHeight/2-d.y*zoom.scale());
+	zoom.translate([dcx,dcy]);
+	 g.attr("transform", "translate("+ dcx + "," + dcy  + ")scale(" + zoom.scale() + ")");
+	 
+	 
+	});
+	
+    
     simulation.nodes(nodes)
     .on("tick", ticked);
 
@@ -207,8 +219,7 @@ function neighboring(a, b) {
     return linkedByIndex[a.index + "," + b.index];
 }
 
-
-    function connectedNodes() {
+function connectedNodes() {
 
     if (toggle == 0) {
         //Reduce the opacity of all but the neighbouring nodes
