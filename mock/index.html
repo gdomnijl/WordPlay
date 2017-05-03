@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <style type="text/css">
       .graph-svg-component {
@@ -9,25 +10,26 @@
     </style>
     <title>Word Play Visualization</title>
     <link rel="stylesheet" type="text/css" href="lab.css">
-      
-       <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <!-- Adding libraries for search box -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
-
     <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
-  </head></script>
-    <script src="https://d3js.org/d3-color.v1.min.js"></script>
-  
-  </head>
-  <body>
+    <link href="select2.min.css" rel="stylesheet" />
+<script src="select2.min.js"></script>
+</head>
+</script>
+<script src="https://d3js.org/d3-color.v1.min.js"></script>
+</head>
+
+<body>
     <h1>Word Play Visualization</h1>
+    
+    <label for="search2"> <b><i> Search for a specific node </i></b>
+    <select id="search2"><option value="2" selected="selected" disabled="disabled"></option> </select>
+    <button type="button" onclick="searchNode()">Search</button> </label>
       
-       <div class="ui-widget">
-        <label for="search"> Search a specific node </label>
-        <input id="search" placeholder= "Enter node name">
-        <button type="button" onclick="searchNode()">Search</button>
-</div>
-       <script type="text/javascript" src="mock_single_word.js"></script>
-   
-  </body>
+
+    <script type="text/javascript" src="mock.js"></script>
+</body>
+
 </html>
