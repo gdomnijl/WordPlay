@@ -203,12 +203,12 @@ for (var i = 0; i < nodes.length - 1; i++) {
 }
 optArray = optArray.sort();
 
-
 $(function () {
-    $("#search").autocomplete({
-        source: optArray
-    });
-});
+    $("#search2").select2({
+  data: optArray,
+  //placeholder: "Select a state",
+  //allowClear: true
+})});
 
     
 /* Not working
@@ -365,7 +365,7 @@ function dragended(d) {
 //**************For Searchbox
 function searchNode() {
     //find the node
-    var selectedVal = document.getElementById('search').value;
+    var selectedVal = document.getElementById('search2').value;
     var node = svg.selectAll(".nodes");
     if (selectedVal == "none") {
         node.style("stroke", "white").style("stroke-width", "1");
