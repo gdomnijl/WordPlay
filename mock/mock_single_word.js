@@ -40,7 +40,8 @@ function addToGraph(data, index){
     //check if the nodes already exist in the set
     //if not push in nodes array AND add to nodeSet
     if(!nodeSet.has(data[index].Source)) {
-        nodes.push({"word": data[index].Source});
+        nodes.push({"word": data[index].Source,
+                    "index": index;});
         nodeSet.add(data[index].Source);
     }
     if(!nodeSet.has(data[index].Target)) {
@@ -98,6 +99,7 @@ d3.queue()
         //filter 1st to Nth node within each 10 subnodes
       if (i % 10 <= NUM_NEIGHBOR) {
       //Future: if (Math.floor(i/10) <= NUM_LAYERS) {
+          var layer = 0;
           addToGraph(data, i);
            //}
        }
