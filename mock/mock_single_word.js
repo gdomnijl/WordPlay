@@ -56,39 +56,6 @@ function addToGraph(data, index){
     }
 }
 
-//Trying to convert csv to json
-   // ref: http://stackoverflow.com/a/1293163/2343
-    // This will parse a delimited string into an array of
-    // arrays. The default delimiter is the comma, but this
-    // can be overriden in the second argument.
-//var csv is the CSV file with headers
-/*function csvJSON(csv){
-
-  var lines =csv.toString();
-      console.log(lines);
-
-  var test = lines.split("\n"); 
-    console.log(test);
-  var result = [];
-
-  var headers=lines[0].toString().split(",");
-
-  for(var i=1;i<lines.length;i++){
-
-	  var obj = {};
-	  var currentline=lines[i].split(",");
-
-	  for(var j=0;j<headers.length;j++){
-		  obj[headers[j]] = currentline[j];
-	  }
-
-	  result.push(obj);
-
-  }
-  
-  //return result; //JavaScript object
-  return JSON.stringify(result); //JSON
-}*/
 
 d3.queue()
 .defer(d3.json, 'red.json')
@@ -322,6 +289,61 @@ function restart() {
 
     }
     })
+
+var  margin = {right: 50, left: 50},
+    width = 600,
+    height = 100;
+
+var svg2 = d3.select("svg2")
+             .attr("width", width)
+             .attr("height",height);
+
+var x = d3.scaleLinear()
+    .domain([0, 180])
+    .range([0, width])
+    .clamp(true);
+
+var slider = svg2.append("g")
+    .attr("class", "slider")
+    .attr("transform", "translate(" + margin.left + "," + height / 2 + ")");
+
+slider.append("line")
+    .attr("class", "track")
+    .attr("x1", x.range()[0])
+    .attr("x2", x.range()[1])
+  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+    .attr("class", "track-inset")
+  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+    .attr("class", "track-overlay")
+    .call(d3.drag()
+        .on("start.interrupt", function() { slider.interrupt(); })
+        .on("start drag", function() { hue(x.invert(d3.event.x)); }));
+
+slider.insert("g", ".track-overlay")
+    .attr("class", "ticks")
+    .attr("transform", "translate(0," + 18 + ")")
+  .selectAll("text")
+  .data(x.ticks(10))
+  .enter().append("text")
+    .attr("x", x)
+    .attr("text-anchor", "middle")
+    .text(function(d) { return d + "°"; });
+
+var handle = slider.insert("circle", ".track-overlay")
+    .attr("class", "handle")
+    .attr("r", 9);
+
+slider.transition() // Gratuitous intro!
+    .duration(750)
+    .tween("hue", function() {
+      var i = d3.interpolate(0, 70);
+      return function(t) { hue(i(t)); };
+    });
+
+function hue(h) {
+  handle.attr("cx", x(h));
+  svg2.style("background-color", d3.hsl(h, 0.8, 0.8));
+}
 
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
