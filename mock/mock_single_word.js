@@ -7,13 +7,12 @@ var svg = d3.select('body').append('svg')
 
 var manyBody = d3.forceManyBody()
                  //.strength();
-var collide = d3.forceCollide([1]);
+//var collide = d3.forceCollide([1]);
 var simulation = d3.forceSimulation()
         .force("link", d3.forceLink().id(d => d.word))
                             //.distance())
         .force("charge", manyBody)
         .force("center", d3.forceCenter(svg_width/2, svg_height/2));
-
 
 
 //random number generator 
@@ -25,6 +24,7 @@ function randomWholeNum(diff,min) {
 
 //MACRO CONSTANTS:
 var NUM_NEIGHBOR = 10;
+//future: var NUM_LAYERS = 10;
 
 var nodes = []
 var nodeSet = new Set([]);
@@ -86,16 +86,18 @@ function addToGraph(data, index){
 d3.queue()
 .defer(d3.json, 'trump.json')
 .await(function(error,data){
-
+    console.log(data);
     //Step 1: Select which data rows to put into graph
     for(var i = 0; i < data.length; i ++) {
         //Since each node is linked to 10 subnodes
         //filter 1st to Nth node within each 10 subnodes
-       if (i % 10 <= NUM_NEIGHBOR) {
+      if (i % 10 <= NUM_NEIGHBOR) {
+      //Future: if (Math.floor(i/10) <= NUM_LAYERS) {
           addToGraph(data, i);
+           //}
        }
     }
-    
+    console.log(links);
     //Step 2: After nodes/links are filled in
     //Set up colorScale and sizeScale according to the max and min
     
@@ -149,6 +151,7 @@ d3.queue()
     //The more similar the words, the closer they are
     .distance(d => 50*(1-d.value) + 50);
     
+    
     function ticked() {
     link
       .attr("x1", d => d.source.x )
@@ -159,56 +162,83 @@ d3.queue()
     node
       .attr("cx", d => d.x )
       .attr("cy", d => d.y );
+        
     }
     
-//Feature A: highlight 
+/* Not working
+//**********Feature B: expel nodes beyond threshold
+    //adjust threshold
 
-//Toggle stores whether the highlighting is on
-var toggle = 0;
+function threshold(thresh) {
+    links.splice(0, links.length);
 
-//Create an array logging what is connected to what
-var linkedByIndex = {};
-    
-//Every node is linking to itself 
-for (i = 0; i < nodes.length; i++) {
-    linkedByIndex[i + "," + i] = 1;
-};
-
-//Logging from links array
-links.forEach(function (d) {
-    linkedByIndex[d.source.index + "," + d.target.index] = 1;
-});
-
-//This function looks up whether a pair are neighbours  
-function neighboring(a, b) {
-    return linkedByIndex[a.index + "," + b.index];
+		for (var i = 0; i < links.length; i++) {
+			if (links[i].value > thresh) {links.push(links[i]);}
+		}
+    restart();
 }
 
-function connectedNodes() {
 
-    if (toggle == 0) {
-        //Reduce the opacity of all but the neighbouring nodes
-        d = d3.select(this).node().__data__;
-        node.style("opacity", function (o) {
-            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.05;
-        });
-        
-        link.style("opacity", function (o) {
-            return d.index==o.source.index | d.index==o.target.index ? 1 : 0.05;
-        });
-        
-        //Reduce the op
-        
-        toggle = 1;
-    } else {
-        //Put them back to opacity=1
-        node.style("opacity", 1);
-        link.style("opacity", 1);
-        toggle = 0;
+//Restart the visualisation after any node and link changes
+
+function restart() {
+	
+	link = link.data(links);
+	link.exit().remove();
+	link.enter().insert("line", ".node").attr("class", "link");
+	node = node.data(nodes);
+	node.enter().insert("circle", ".cursor").attr("class", "node").attr("r", 5).call(force.drag);
+	force.start();
+}*/
+
+//**********Feature A: highlight 
+
+    //Toggle stores whether the highlighting is on
+    var toggle = 0;
+
+    //Create an array logging what is connected to what
+    var linkedByIndex = {};
+
+    //Every node is linking to itself 
+    for (i = 0; i < nodes.length; i++) {
+        linkedByIndex[i + "," + i] = 1;
+    };
+
+    //Logging from links array
+    links.forEach(function (d) {
+        linkedByIndex[d.source.index + "," + d.target.index] = 1;
+    });
+
+    //This function looks up whether a pair are neighbours  
+    function neighboring(a, b) {
+        return linkedByIndex[a.index + "," + b.index];
     }
 
-}
-})
+    function connectedNodes() {
+
+        if (toggle == 0) {
+            //Reduce the opacity of all but the neighbouring nodes
+            d = d3.select(this).node().__data__;
+            node.style("opacity", function (o) {
+                return neighboring(d, o) | neighboring(o, d) ? 1 : 0.05;
+            });
+
+            link.style("opacity", function (o) {
+                return d.index==o.source.index | d.index==o.target.index ? 1 : 0.05;
+            });
+
+            //Reduce the op
+
+            toggle = 1;
+        } else {
+            //Put them back to opacity=1
+            node.style("opacity", 1);
+            link.style("opacity", 1);
+            toggle = 0;
+        }
+
+    }
+    })
 
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
