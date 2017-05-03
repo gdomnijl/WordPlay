@@ -7,8 +7,7 @@ var svg = d3.select('body').append('svg')
             .attr("class", "graph-svg-component");
 
 var manyBody = d3.forceManyBody()
-                 .strength(-100);
-//var collide = d3.forceCollide([1]);
+                 .strength(-90);
 var simulation = d3.forceSimulation()
         .force("link", d3.forceLink().id(d => d.word))
                             //.distance())
@@ -25,6 +24,7 @@ function randomWholeNum(diff,min) {
 
 //MACRO CONSTANTS:
 var NUM_NEIGHBOR = 10;
+var MIN_SIM = 0.3;
 //future: var NUM_LAYERS = 10;
 
 var nodes = []
@@ -36,12 +36,12 @@ var highlight_color = "blue";
 var default_link_color = "#888";
 
 function addToGraph(data, index){
-    
+    if(data[index].Similarity >= MIN_SIM) {
+        
     //check if the nodes already exist in the set
     //if not push in nodes array AND add to nodeSet
     if(!nodeSet.has(data[index].Source)) {
-        nodes.push({"word": data[index].Source,
-                    "index": index;});
+        nodes.push({"word": data[index].Source});
         nodeSet.add(data[index].Source);
     }
     if(!nodeSet.has(data[index].Target)) {
@@ -53,6 +53,7 @@ function addToGraph(data, index){
          "source": data[index].Source,
          "target": data[index].Target, 
          "value": parseFloat(data[index].Similarity)});
+    }
 }
 
 //Trying to convert csv to json
@@ -90,7 +91,7 @@ function addToGraph(data, index){
 }*/
 
 d3.queue()
-.defer(d3.json, 'trump.json')
+.defer(d3.json, 'red.json')
 .await(function(error,data){
     console.log(data);
     //Step 1: Select which data rows to put into graph
@@ -99,7 +100,6 @@ d3.queue()
         //filter 1st to Nth node within each 10 subnodes
       if (i % 10 <= NUM_NEIGHBOR) {
       //Future: if (Math.floor(i/10) <= NUM_LAYERS) {
-          var layer = 0;
           addToGraph(data, i);
            //}
        }
@@ -114,8 +114,9 @@ d3.queue()
     var maxVal = Math.max(...values);
     var minVal = Math.min(...values);
     console.log(maxVal,minVal); 
+    console.log(Math.max(minVal, MIN_SIM));
     var colorScale = d3.scaleLinear()
-                    .domain([minVal,maxVal])
+                    .domain([Math.max(minVal, MIN_SIM), maxVal])
                      .range(["#e5f5f9", "#2ca25f"]);
     var sizeScale = d3.scaleLinear()
                     .domain([minVal,maxVal])
@@ -142,7 +143,7 @@ d3.queue()
                 .attr("r", 10)
                 .attr("fill", function(d,i){
                     if(i == 0){ return "black"; } 
-                    else { return colorScale(0.5)}})
+                    else {return colorScale(maxVal);}})
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
