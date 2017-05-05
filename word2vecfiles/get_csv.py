@@ -21,7 +21,7 @@ def wordlayers(wordstr,model):
                     if layer3[0] not in wordlist1:
                         df.loc[count] = np.array([layer2[0],layer3[0],str(layer3[1])])
                         count += 1
-    return df.to_json(orient='records')
+    return df
 
 def wordfreq(words,model):
     freq = pd.DataFrame(columns=['Word','Count'])
@@ -31,5 +31,5 @@ def wordfreq(words,model):
             continue
         freq.loc[count] = np.array([word,model.wv.vocab[word].count])
         count += 1
-    return freq.to_json(orient='records')
+    return freq
 
