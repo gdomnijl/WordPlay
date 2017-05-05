@@ -11,26 +11,28 @@ def wordlayers(wordstr,model,filename,layer):
     df = pd.DataFrame(columns=['Source','Target','Similarity'])
     count = 0
     for layer1 in wordlist:
-        df.loc[count] = np.array([wordstr,layer1[0].encode('utf-8'),str(layer1[1])])
+        df.loc[count] = np.array([wordstr,layer1[0],str(layer1[1])])
         count += 1
         wordlist1 = model.most_similar(layer1[0])
         for layer2 in wordlist1:
             if layer2[0] != wordstr:
-                df.loc[count] = np.array([layer1[0].encode('utf-8'),layer2[0].encode('utf-8'),str(layer2[1])])
+                df.loc[count] = np.array([layer1[0],layer2[0],str(layer2[1])])
                 count += 1
                 wordlist2 = model.most_similar(layer2[0])
                 if layer == 3:
                     for layer3 in wordlist2:
                         if layer3[0] not in wordlist1:
-                            df.loc[count] = np.array([layer2[0].encode('utf-8'),layer3[0].encode('utf-8'),str(layer3[1])])
+                            df.loc[count] = np.array([layer2[0],layer3[0],str(layer3[1])])
                             count += 1
-    df.to_json(filename,orient='records')
+    return df.to_json(orient='records')
 
 def wordfreq(words,model):
-    freq = {}
+    freq = pd.DataFrame(columns=['Word','Count'])
+    count = 0
     for word in words:
         if word not in model.wv.vocab:
             continue
-        freq[word] = model.wv.vocab[word].count
-    return freq
+        freq.loc[count] = np.array([word,model.wv.vocab[word].count])
+        count += 1
+    return freq.to_json(orient='records')
 
