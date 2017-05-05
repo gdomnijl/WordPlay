@@ -1,10 +1,8 @@
 import gensim
 import numpy as np
 import pandas as pd
-def wordlayers(wordstr,model,layer):
+def wordlayers(wordstr,model):
     assert type(wordstr) is str
-    assert layer < 4
-    assert layer > 1
     if wordstr not in model.wv.vocab:
         return(-1)
     wordlist = model.most_similar(wordstr)
@@ -19,11 +17,10 @@ def wordlayers(wordstr,model,layer):
                 df.loc[count] = np.array([layer1[0],layer2[0],str(layer2[1])])
                 count += 1
                 wordlist2 = model.most_similar(layer2[0])
-                if layer == 3:
-                    for layer3 in wordlist2:
-                        if layer3[0] not in wordlist1:
-                            df.loc[count] = np.array([layer2[0],layer3[0],str(layer3[1])])
-                            count += 1
+                for layer3 in wordlist2:
+                    if layer3[0] not in wordlist1:
+                        df.loc[count] = np.array([layer2[0],layer3[0],str(layer3[1])])
+                        count += 1
     return df.to_json(orient='records')
 
 def wordfreq(words,model):
