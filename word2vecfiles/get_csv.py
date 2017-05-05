@@ -1,12 +1,12 @@
 import gensim
 import numpy as np
 import pandas as pd
-def wordlayers(wordstr,model,filename,layer):
+def wordlayers(wordstr,model,layer):
     assert type(wordstr) is str
-    assert type(filename) is str
+    assert layer < 4
+    assert layer > 1
     if wordstr not in model.wv.vocab:
         return(-1)
-    con = open(filename,'w')
     wordlist = model.most_similar(wordstr)
     df = pd.DataFrame(columns=['Source','Target','Similarity'])
     count = 0
