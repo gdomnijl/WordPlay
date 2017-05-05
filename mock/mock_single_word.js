@@ -23,7 +23,7 @@ function randomWholeNum(diff,min) {
 }
 
 //MACRO CONSTANTS:
-var NUM_NEIGHBOR = 3;
+var NUM_NEIGHBOR = 2;
 var MIN_SIM = 0.3;
 //future: var NUM_LAYERS = 10;
 
