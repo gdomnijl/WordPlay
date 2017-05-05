@@ -23,69 +23,122 @@ function randomWholeNum(diff,min) {
 }
 
 //MACRO CONSTANTS:
-var NUM_NEIGHBOR = 10;
+var NUM_NEIGHBOR = 3;
 var MIN_SIM = 0.3;
 //future: var NUM_LAYERS = 10;
 
 var nodes = []
 var nodeSet = new Set([]);
+var pairSet = new Set([]);
+var subnodeMap = new Map();
+var parentMap = new Map();
 var links = []
 var focus_node = null;
 var highlight_node = null;
 var highlight_color = "blue";
 var default_link_color = "#888";
 
-function addToGraph(data, index){
+function indexNodes(data, index){
     if(data[index].Similarity >= MIN_SIM) {
-        
-    //check if the nodes already exist in the set
-    //if not push in nodes array AND add to nodeSet
-    if(!nodeSet.has(data[index].Source)) {
-        nodes.push({"word": data[index].Source});
-        nodeSet.add(data[index].Source);
-    }
-    if(!nodeSet.has(data[index].Target)) {
-        nodes.push({"word": data[index].Target});
-        nodeSet.add(data[index].Target);
+        var pair = (data[index].Source+data[index].Target);
+        if(!pairSet.has(pair)) {
+            pairSet.add(pair);
+    
+        if(!parentMap.has(data[index].Source)) {
+            parentMap.set(data[index].Source, 0);
+        }
+        //Adding only Target node in subnodeMap 
+        //and logging the position they are at 
+        //**if no, add in the Target node as the first node
+        if(!subnodeMap.has(data[index].Target)) {
+            subnodeMap.set(data[index].Target, 1);
+            var numNodes = parentMap.get(data[index].Source);
+            parentMap.set(data[index].Source, numNodes + 1);        
+        } else {
+        //**if yes, increment current index and add in its position
+            var numNodes = parentMap.get(data[index].Source);
+            parentMap.set(data[index].Source, numNodes + 1);
+            
+           // var previndex = subnodeMap.get(data[index].Target);
+          //  var curindex = Math.min(previndex, numNodes + 1)
+            subnodeMap.set(data[index].Target, numNodes + 1);
+           // console.log("hit same target");
+          //console.log(index);
+        }  
+}
+}
+}
 
-    }
+function addToGraph(data,index){
+   
+    if(subnodeMap.get(data[index].Target) <= NUM_NEIGHBOR && 
+       subnodeMap.get(data[index].Source) <= NUM_NEIGHBOR){
+       //check if the nodes already exist in the set
+        //if not push in nodes array AND add to nodeSet
+        if(!nodeSet.has(data[index].Source)) {
+            nodes.push({"word": data[index].Source});
+            nodeSet.add(data[index].Source);
+        }
+
+        if(!nodeSet.has(data[index].Target)) {
+            nodes.push({"word": data[index].Target});
+            nodeSet.add(data[index].Target);
+        }
+       
     links.push({
          "source": data[index].Source,
          "target": data[index].Target, 
          "value": parseFloat(data[index].Similarity)});
     }
-}
-
+    }
 
 d3.queue()
-.defer(d3.json, 'red.json')
+.defer(d3.json, 'maddie.json')
 .await(function(error,data){
+
     console.log(data);
-    //Step 1: Select which data rows to put into graph
-    for(var i = 0; i < data.length; i ++) {
-        //Since each node is linked to 10 subnodes
-        //filter 1st to Nth node within each 10 subnodes
-      if (i % 10 <= NUM_NEIGHBOR) {
-      //Future: if (Math.floor(i/10) <= NUM_LAYERS) {
-          addToGraph(data, i);
-           //}
-       }
+    //Step 0: Record the first entry as the central word
+    var centralWord = data[0].Source;
+    
+    //Step 1: Sort the entries alphabetically according to Source 
+    function compareStrings(a, b) {
+        return (a < b) ? -1 : (a > b) ? 1 : 0;
     }
-    console.log(links);
-    //Step 2: After nodes/links are filled in
+    data.sort(function(a, b) {
+        return compareStrings(a.Source, b.Source);
+    })
+    //Check:
+    //console.log("sorted:");
+    //console.log(data);
+    
+    //Step 2: Select which data rows to put into graph
+    for(var i = 0; i < data.length; i ++) {
+    
+          indexNodes(data,i);
+        //Make sure the central word always show
+          subnodeMap.set(centralWord, 0);
+          addToGraph(data,i);       
+   
+    }
+    console.log("subnodeMap:");
+    console.log(subnodeMap);
+    console.log("parentMap:");
+    console.log(parentMap);
+    console.log("pairSet");
+    console.log(pairSet);
+    //Step 3: After nodes/links are filled in
     //Set up colorScale and sizeScale according to the max and min
     
     //Extracting just the value arrays
     var values = links.map(function(a) {return a.value;});
-    
+   // console.log(values);
     var maxVal = Math.max(...values);
     var minVal = Math.min(...values);
     console.log(maxVal,minVal); 
-    console.log(Math.max(minVal, MIN_SIM));
     var colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
                      .range(["#e5f5f9", "#2ca25f"]);
-    var sizeScale = d3.scaleLinear()
+    var sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
                     .range([2,8]);
    
@@ -108,8 +161,8 @@ d3.queue()
                 .attr("id", d => d.word)
     //Arbitrarily setting node of size 10
                 .attr("r", 10)
-                .attr("fill", function(d,i){
-                    if(i == 0){ return "black"; } 
+                .attr("fill", function(d){
+                    if(d.word == centralWord){ return "black"; } 
                     else {return colorScale(maxVal);}})
                     .call(d3.drag()
                     .on("start", dragstarted)
@@ -129,8 +182,6 @@ d3.queue()
     .attr("dx",10)
     .attr("dy", ".35em")
     .text(function(d) { return d.word});
-    
-    
     
     simulation.nodes(nodes)
     .on("tick", ticked);
@@ -176,8 +227,6 @@ d3.queue()
             link.style("stroke", function(o) {
 		      return o.source.index == d.index || o.target.index == d.index ? highlight_color : colorScale(o.value)})
             }}
-	
-
 
 function exit_highlight(){
 		highlight_node = null;
@@ -290,60 +339,6 @@ function restart() {
     }
     })
 
-var  margin = {right: 50, left: 50},
-    width = 600,
-    height = 100;
-
-var svg2 = d3.select("svg2")
-             .attr("width", width)
-             .attr("height",height);
-
-var x = d3.scaleLinear()
-    .domain([0, 180])
-    .range([0, width])
-    .clamp(true);
-
-var slider = svg2.append("g")
-    .attr("class", "slider")
-    .attr("transform", "translate(" + margin.left + "," + height / 2 + ")");
-
-slider.append("line")
-    .attr("class", "track")
-    .attr("x1", x.range()[0])
-    .attr("x2", x.range()[1])
-  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
-    .attr("class", "track-inset")
-  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
-    .attr("class", "track-overlay")
-    .call(d3.drag()
-        .on("start.interrupt", function() { slider.interrupt(); })
-        .on("start drag", function() { hue(x.invert(d3.event.x)); }));
-
-slider.insert("g", ".track-overlay")
-    .attr("class", "ticks")
-    .attr("transform", "translate(0," + 18 + ")")
-  .selectAll("text")
-  .data(x.ticks(10))
-  .enter().append("text")
-    .attr("x", x)
-    .attr("text-anchor", "middle")
-    .text(function(d) { return d + "°"; });
-
-var handle = slider.insert("circle", ".track-overlay")
-    .attr("class", "handle")
-    .attr("r", 9);
-
-slider.transition() // Gratuitous intro!
-    .duration(750)
-    .tween("hue", function() {
-      var i = d3.interpolate(0, 70);
-      return function(t) { hue(i(t)); };
-    });
-
-function hue(h) {
-  handle.attr("cx", x(h));
-  svg2.style("background-color", d3.hsl(h, 0.8, 0.8));
-}
 
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
