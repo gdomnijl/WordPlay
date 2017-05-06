@@ -27,91 +27,108 @@ function randomWholeNum(diff,min) {
 
 //MACRO CONSTANTS:
 //# of neighboring nodes:
-var NUM_NEIGHBOR = 1;
+var NUM_NEIGHBOR = 11;
 //# 
-var MIN_SIM = 0.3;
+var MIN_SIM = 0;
 //future: var NUM_LAYERS = 10;
 
 var nodes = []
 var nodeSet = new Set([]);
 var pairSet = new Set([]);
-var subnodeMap = new Map();
-var parentMap = new Map();
-var layers = [[]];
+var layer = new Map();
+//Map has all the source nodes as keys 
+var map = new Map();
 var links = []
+
 var focus_node = null;
 var highlight_node = null;
 var highlight_color = "blue";
 var default_link_color = "#888";
 
-function indexNodes(data, index){
-    if(data[index].Similarity >= MIN_SIM) {
-        var pair = (data[index].Source+data[index].Target);
+function indexNodes(row){
+    if(row.Similarity >= MIN_SIM) {
+        var pair = (row.Source+row.Target);
         if(!pairSet.has(pair)) {
             pairSet.add(pair);
-        
-            
-        if(!parentMap.has(data[index].Source)) {
-            parentMap.set(data[index].Source, 0);
+        if(!map.has(row.Source)) {
+            map.set(row.Source, []);
         }
-        //Adding only Target node in subnodeMap 
-        //and logging the position they are at 
-        //**if no, add in the Target node as the first node
-        if(!subnodeMap.has(data[index].Target)) {
-            subnodeMap.set(data[index].Target, 1);
-            var numNodes = parentMap.get(data[index].Source);
-            parentMap.set(data[index].Source, numNodes + 1);        
-        } else {
-        //**if yes, increment current index and add in its position
-            var numNodes = parentMap.get(data[index].Source);
-            parentMap.set(data[index].Source, numNodes + 1);
-            
-           // var previndex = subnodeMap.get(data[index].Target);
-          //  var curindex = Math.min(previndex, numNodes + 1)
-            subnodeMap.set(data[index].Target, numNodes + 1);
-           // console.log("hit same target");
-          //console.log(index);
-        }  
-}
-}
+            var subnodes = map.get(row.Source);
+            subnodes.push(row.Target);
+            map.set(row.Source, subnodes);              
+        }
+     }
 }
 
-function addToGraph(data,index){
-   
-    if(subnodeMap.get(data[index].Target) <= NUM_NEIGHBOR && 
-       subnodeMap.get(data[index].Source) <= NUM_NEIGHBOR){
-       //check if the nodes already exist in the set
+function assignLayer(curWord,cur){
+    if (cur >=3) {return 1;} else{
+        //if never assigned a layer before assign now
+    if(!layer.has(curWord)){
+    layer.set(curWord, cur);
+    }
+        //then recursively assign layer for its subnodes            
+        if(map.has(curWord)) {
+    var nextLayer = map.get(curWord);
+    for (each of nextLayer){
+        if(!layer.has(each)){
+            //set layer for subnodes in next layers excluding parentWord
+            var next = cur + 1;
+            console.log(curWord + " to " + each);
+            console.log(next);
+        layer.set(each, next);
+        assignLayer(each,next);
+        }
+    }
+        }
+    }
+}
+    
+
+/*
+function assignLayer(centralWord, cur){
+    if (cur >= 3) {return;} else{
+        
+    layer.set(centralWord, cur);
+    var first = map.get(centralWord);
+    for (each of first){
+        layer.set(each, cur+1);
+        assignLayer(each,cur+1)
+    }
+    }
+}
+*/
+function addToGraph(row){
+     //check if the nodes already exist in the set
         //if not push in nodes array AND add to nodeSet
-        if(!nodeSet.has(data[index].Source)) {
-            nodes.push({"word": data[index].Source,
-                        "id": nodeSet.size});
-            var cur = nodeSet.size;
-            nodeSet.add(data[index].Source);
-            layers.push(cur);
-        }
-
-        if(!nodeSet.has(data[index].Target)) {
-            nodes.push({"word": data[index].Target,
-                       "id": nodeSet.size});
-            var cur = nodeSet.size;
-            nodeSet.add(data[index].Target);
-            var cur2 = layers.length;
-           // layers[cur2].push(cur);
-        }
-       
-    links.push({
-         "source": data[index].Source,
-         "target": data[index].Target, 
-         "value": parseFloat(data[index].Similarity)});
         
-    }
-    }
+    if(!nodeSet.has(row.Source)) {
+            
+            nodes.push({"word": row.Source,
+                       "layer": layer.get(row.Source)});     
+            nodeSet.add(row.Source);
+        }
+    //only add in subnodes within the threshold
+    for (var i = 0; i < NUM_NEIGHBOR; i++) {
+        var target = map.get(row.Source)[i];
+         if(!nodeSet.has(target)) {
+            nodes.push({"word": target,
+                      "layer": layer.get(row.Source)});    
+            nodeSet.add(target);
+             //targetSet.add(target);
+        }
+         links.push({
+         "source": row.Source,
+         "target": target, 
+         "value": parseFloat(row.Similarity)});
+        }
+   }
+
 
 d3.queue()
 .defer(d3.json, 'maddie.json')
 .await(function(error,data){
 
-    console.log(data);
+    //console.log(data);
     //Step 0: Record the first entry as the central word
     var centralWord = data[0].Source;
     
@@ -127,20 +144,40 @@ d3.queue()
     //console.log(data);
     
     //Step 2: Select which data rows to put into graph
-    for(var i = 0; i < data.length; i ++) {
+    for(row of data) {
     
-          indexNodes(data,i);
+          indexNodes(row);
+       
         //Make sure the central word always show
-          subnodeMap.set(centralWord, 0);
-          addToGraph(data,i);       
-   
+        //  subnodeMap.set(centralWord, 0);
+                 addToGraph(row);   
+
     }
-    console.log("subnodeMap:");
-    console.log(subnodeMap);
-    console.log("parentMap:");
-    console.log(parentMap);
-    console.log("node");
+    
+    //****has to be after indexNodes finish
+    var firstLayer = map.get(centralWord);
+    layer.set(centralWord,0);
+    for(each of firstLayer){
+          assignLayer(each,1);
+    }
+       
+        console.log("layers: (all unique nodes) " + layer.size);
+        console.log(layer);
+    console.log("node: (unique nodes after filtering) " + nodes.length);
     console.log(nodes);
+    //console.log("entries for maddie: ")
+    //console.log(map.get("maddie"));
+   /* console.log("total JSON entries " + data.length);
+      console.log("total pairSet entries: " + pairSet.size);
+    console.log("links in graph: " + links.length);
+    
+  
+    
+    console.log("nodeSet: (unique nodes after filtering) " + nodeSet.size);
+    console.log(nodeSet);
+    console.log("map: (all souce nodes) " +map.size);
+    console.log(map);*/
+ 
     //Step 3: After nodes/links are filled in
     //Set up colorScale and sizeScale according to the max and min
     
@@ -154,6 +191,11 @@ d3.queue()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
                     .range(["#df65b0","#78c679"]);
                     // .range(["#e5f5f9", "#2ca25f"]);
+    var groupColorScale = d3.scaleOrdinal()
+                            .domain([0,1,2,3])
+                            .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
+
+                                    //, 
     var sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
                     .range([2,8]);
@@ -177,9 +219,9 @@ d3.queue()
                 .attr("id", d => d.word)
     //Arbitrarily setting node of size 10
                 .attr("r", 10)
-                .attr("fill", function(d){
-                    if(d.word == centralWord){ return "black"; } 
-                    else {return colorScale(maxVal);}})
+                .attr("fill", d => groupColorScale(d.layer))
+                   // if(d.word == centralWord){ return "black"; } 
+                    //else {return colorScale(maxVal);}})
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
