@@ -26,7 +26,9 @@ function randomWholeNum(diff,min) {
 }
 
 //MACRO CONSTANTS:
-var NUM_NEIGHBOR = 8;
+//# of neighboring nodes:
+var NUM_NEIGHBOR = 1;
+//# 
 var MIN_SIM = 0.3;
 //future: var NUM_LAYERS = 10;
 
@@ -83,19 +85,25 @@ function addToGraph(data,index){
         if(!nodeSet.has(data[index].Source)) {
             nodes.push({"word": data[index].Source,
                         "id": nodeSet.size});
+            var cur = nodeSet.size;
             nodeSet.add(data[index].Source);
+            layers.push(cur);
         }
 
         if(!nodeSet.has(data[index].Target)) {
             nodes.push({"word": data[index].Target,
                        "id": nodeSet.size});
+            var cur = nodeSet.size;
             nodeSet.add(data[index].Target);
+            var cur2 = layers.length;
+           // layers[cur2].push(cur);
         }
        
     links.push({
          "source": data[index].Source,
          "target": data[index].Target, 
          "value": parseFloat(data[index].Similarity)});
+        
     }
     }
 
@@ -144,7 +152,7 @@ d3.queue()
     console.log(maxVal,minVal); 
     var colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
-                    .range(["#ffffb2", "#bd0026"]);
+                    .range(["#df65b0","#78c679"]);
                     // .range(["#e5f5f9", "#2ca25f"]);
     var sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
@@ -328,7 +336,7 @@ function restart() {
             });
 
             link.style("opacity", function (o) {
-                return d.index==o.source.index | d.index==o.target.index ? 1 : 0.001;
+                return d.index==o.source.index | d.index==o.target.index ? 1 : 0.003;
             });
 
             text.style("opacity", function (o) {
