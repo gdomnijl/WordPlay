@@ -27,7 +27,7 @@ function randomWholeNum(diff,min) {
 
 //MACRO CONSTANTS:
 //# of neighboring nodes:
-var NUM_NEIGHBOR = 1;
+var NUM_NEIGHBOR = 3;
 //# 
 var MIN_SIM = 0.3;
 //future: var NUM_LAYERS = 10;
@@ -152,8 +152,8 @@ d3.queue()
     console.log(maxVal,minVal); 
     var colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
-                    .range(["#df65b0","#78c679"]);
-                    // .range(["#e5f5f9", "#2ca25f"]);
+                    //.range(["#88EEC2","#00193D"]);
+                    .range(["#A2BDDF", "#00234D"]);
     var sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
                     .range([2,8]);
@@ -179,7 +179,7 @@ d3.queue()
                 .attr("r", 10)
                 .attr("fill", function(d){
                     if(d.word == centralWord){ return "black"; } 
-                    else {return colorScale(maxVal);}})
+                    else {return "#FF9B71";}})
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
