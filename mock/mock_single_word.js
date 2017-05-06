@@ -227,7 +227,6 @@ var sizeScale = d3.scaleLog()
                 .attr("fill", d => groupColorScale(d.layer))
                    // if(d.word == centralWord){ return "black"; } 
                     //else {return colorScale(maxVal);}})
-
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
