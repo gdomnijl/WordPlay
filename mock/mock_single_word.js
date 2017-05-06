@@ -7,13 +7,16 @@ var svg = d3.select('body').append('svg')
             .attr("class", "graph-svg-component");
 
 var manyBody = d3.forceManyBody()
-                 .strength(-90);
-var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(d => d.word))
-                            //.distance())
-        .force("charge", manyBody)
-        .force("center", d3.forceCenter(svg_width/2, svg_height/2));
+                 .strength(-500);
 
+var simulation = d3.forceSimulation()
+        .force("center", d3.forceCenter(svg_width/2, svg_height/2))
+        .force("link", d3.forceLink().id(d => d.word))
+        .force("collide", d3.forceCollide(30).strength(0.2))//.iterations(16))
+        .force("charge", manyBody)
+        .force("y", d3.forceY(0))
+        .force("x", d3.forceX(0));
+    
 
 //random number generator 
 function randomWholeNum(diff,min) {
@@ -23,7 +26,9 @@ function randomWholeNum(diff,min) {
 }
 
 //MACRO CONSTANTS:
-var NUM_NEIGHBOR = 2;
+//# of neighboring nodes:
+var NUM_NEIGHBOR = 1;
+//# 
 var MIN_SIM = 0.3;
 //future: var NUM_LAYERS = 10;
 
@@ -32,6 +37,7 @@ var nodeSet = new Set([]);
 var pairSet = new Set([]);
 var subnodeMap = new Map();
 var parentMap = new Map();
+var layers = [[]];
 var links = []
 var focus_node = null;
 var highlight_node = null;
@@ -43,7 +49,8 @@ function indexNodes(data, index){
         var pair = (data[index].Source+data[index].Target);
         if(!pairSet.has(pair)) {
             pairSet.add(pair);
-    
+        
+            
         if(!parentMap.has(data[index].Source)) {
             parentMap.set(data[index].Source, 0);
         }
@@ -76,19 +83,27 @@ function addToGraph(data,index){
        //check if the nodes already exist in the set
         //if not push in nodes array AND add to nodeSet
         if(!nodeSet.has(data[index].Source)) {
-            nodes.push({"word": data[index].Source});
+            nodes.push({"word": data[index].Source,
+                        "id": nodeSet.size});
+            var cur = nodeSet.size;
             nodeSet.add(data[index].Source);
+            layers.push(cur);
         }
 
         if(!nodeSet.has(data[index].Target)) {
-            nodes.push({"word": data[index].Target});
+            nodes.push({"word": data[index].Target,
+                       "id": nodeSet.size});
+            var cur = nodeSet.size;
             nodeSet.add(data[index].Target);
+            var cur2 = layers.length;
+           // layers[cur2].push(cur);
         }
        
     links.push({
          "source": data[index].Source,
          "target": data[index].Target, 
          "value": parseFloat(data[index].Similarity)});
+        
     }
     }
 
@@ -124,8 +139,8 @@ d3.queue()
     console.log(subnodeMap);
     console.log("parentMap:");
     console.log(parentMap);
-    console.log("pairSet");
-    console.log(pairSet);
+    console.log("node");
+    console.log(nodes);
     //Step 3: After nodes/links are filled in
     //Set up colorScale and sizeScale according to the max and min
     
@@ -137,7 +152,8 @@ d3.queue()
     console.log(maxVal,minVal); 
     var colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
-                     .range(["#e5f5f9", "#2ca25f"]);
+                    .range(["#df65b0","#78c679"]);
+                    // .range(["#e5f5f9", "#2ca25f"]);
     var sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
                     .range([2,8]);
@@ -149,7 +165,7 @@ d3.queue()
             .data(links)
             .enter().append("line")
     //The more similar the words are, the thicker the links
-            .attr("stroke-width", d=> sizeScale(d.value))
+            .attr("stroke-width", 3)
             .attr("stroke", d => colorScale(d.value)); 
 
 	
@@ -183,13 +199,14 @@ d3.queue()
     .attr("dy", ".35em")
     .text(function(d) { return d.word});
     
+
     simulation.nodes(nodes)
     .on("tick", ticked);
 
     simulation.force("link")
     .links(links)
     //The more similar the words, the closer they are
-    .distance(d => 50*(1-d.value) + 50);
+    .distance(d => sizeScale(1-d.value));
     
     
     function ticked() {
@@ -255,8 +272,8 @@ optArray = optArray.sort();
 $(function () {
     $("#search2").select2({
   data: optArray,
-  //placeholder: "Select a state",
-  //allowClear: true
+  placeholder: "Select a state",
+  allowClear: true
 })});
 
     
@@ -319,7 +336,7 @@ function restart() {
             });
 
             link.style("opacity", function (o) {
-                return d.index==o.source.index | d.index==o.target.index ? 1 : 0.05;
+                return d.index==o.source.index | d.index==o.target.index ? 1 : 0.003;
             });
 
             text.style("opacity", function (o) {
