@@ -1,5 +1,5 @@
-var svg_width  = 800;
-var svg_height = 800;
+var svg_width  = window.innerWidth;
+var svg_height = 4/5 * window.innerHeight;
 
 var svg = d3.select('body').append('svg')
             .attr('width', svg_width)
@@ -41,7 +41,7 @@ var layers = [[]];
 var links = []
 var focus_node = null;
 var highlight_node = null;
-var highlight_color = "blue";
+var highlight_color = "#66D7D1";//#29b6f6";//"blue";
 var default_link_color = "#888";
 
 function indexNodes(data, index){
@@ -153,10 +153,14 @@ d3.queue()
     var colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
                     //.range(["#88EEC2","#00193D"]);
-                    .range(["#A2BDDF", "#00234D"]);
+                    //.range(["#A2BDDF", "#00234D"]);
+                     .range(["#A8A6B3", "#0C0C10"]);
     var sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
                     .range([2,8]);
+     var linkScale = d3.scaleLog()
+                    .domain([minVal,maxVal])
+                    .range([0.3,6]);               
    
     //Step 3: Set up link and node
     var link = svg.append("g")
@@ -165,7 +169,7 @@ d3.queue()
             .data(links)
             .enter().append("line")
     //The more similar the words are, the thicker the links
-            .attr("stroke-width", 3)
+            .attr("stroke-width", d => linkScale(d.value))
             .attr("stroke", d => colorScale(d.value)); 
 
 	
@@ -179,7 +183,7 @@ d3.queue()
                 .attr("r", 10)
                 .attr("fill", function(d){
                     if(d.word == centralWord){ return "black"; } 
-                    else {return "#FF9B71";}})
+                    else {return "#FC7753";}}) //#ec407a";}})//"#FF9B71";}})
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
