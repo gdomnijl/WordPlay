@@ -1,5 +1,5 @@
-var svg_width  = 800;
-var svg_height = 800;
+var svg_width  = window.innerWidth;
+var svg_height = 4/5 * window.innerHeight;
 
 var svg = d3.select('body').append('svg')
             .attr('width', svg_width)
@@ -28,6 +28,7 @@ function randomWholeNum(diff,min) {
 //MACRO CONSTANTS:
 //# of neighboring nodes:
 var NUM_NEIGHBOR = 11;
+
 //# 
 var MIN_SIM = 0;
 //future: var NUM_LAYERS = 10;
@@ -42,7 +43,7 @@ var links = []
 
 var focus_node = null;
 var highlight_node = null;
-var highlight_color = "blue";
+var highlight_color = "#66D7D1";//#29b6f6";//"blue";
 var default_link_color = "#888";
 
 function indexNodes(row){
@@ -189,16 +190,20 @@ d3.queue()
     console.log(maxVal,minVal); 
     var colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
-                    .range(["#df65b0","#78c679"]);
-                    // .range(["#e5f5f9", "#2ca25f"]);
-    var groupColorScale = d3.scaleOrdinal()
+
+                    //.range(["#88EEC2","#00193D"]);
+                    //.range(["#A2BDDF", "#00234D"]);
+                     .range(["#A8A6B3", "#0C0C10"]);
+ var groupColorScale = d3.scaleOrdinal()
                             .domain([0,1,2,3])
                             .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
-
-                                    //, 
-    var sizeScale = d3.scaleLog()
+    
+var sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
                     .range([2,8]);
+     var linkScale = d3.scaleLog()
+                    .domain([minVal,maxVal])
+                    .range([0.3,6]);               
    
     //Step 3: Set up link and node
     var link = svg.append("g")
@@ -207,7 +212,7 @@ d3.queue()
             .data(links)
             .enter().append("line")
     //The more similar the words are, the thicker the links
-            .attr("stroke-width", 3)
+            .attr("stroke-width", d => linkScale(d.value))
             .attr("stroke", d => colorScale(d.value)); 
 
 	
@@ -222,6 +227,7 @@ d3.queue()
                 .attr("fill", d => groupColorScale(d.layer))
                    // if(d.word == centralWord){ return "black"; } 
                     //else {return colorScale(maxVal);}})
+
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
@@ -279,10 +285,10 @@ d3.queue()
 
 	if (highlight_color!="white"){
 		  node.style("stroke", function(o) {
-                if (neighboring(d, o)) {
+                if (neighboring(d, o) || neighboring(o,d)) {
                     return highlight_color;}});
 			text.style("font-weight", function(o) {
-                return neighboring(d, o) ? "bold" : "normal";});
+                return (neighboring(d, o)||neighboring(o,d)) ? "bold" : "normal";});
             link.style("stroke", function(o) {
 		      return o.source.index == d.index || o.target.index == d.index ? highlight_color : colorScale(o.value)})
             }}
@@ -314,8 +320,8 @@ optArray = optArray.sort();
 $(function () {
     $("#search2").select2({
   data: optArray,
-  placeholder: "Select a state",
-  allowClear: true
+  placeholder: "Select a node",
+  //allowClear: true
 })});
 
     
@@ -435,3 +441,25 @@ function searchNode() {
             .style("opacity", 1);
     }
 }
+
+$("#ex6").bootstrapSlider();
+$("#ex6").on("slide", function(slideEvt) {
+    $("#ex6SliderVal").text(slideEvt.value);
+});
+
+
+var r = $('#score').bootstrapSlider()
+    .on('slideStop', function(ev){
+    var value = r.getValue();
+        if(value >= 1 && value <= 5){
+            $('.slider-selection').css('background', 'red');
+        }
+        else if(value > 5 && value <= 8) {
+            $('.slider-selection').css('background', 'orange');
+        }
+        else if(value > 8 && value <= 10) {
+            $('.slider-selection').css('background', 'green');
+        }
+        $('#lbl').val = value;
+    })
+    .data('slider');
