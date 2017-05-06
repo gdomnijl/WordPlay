@@ -237,10 +237,10 @@ d3.queue()
 
 	if (highlight_color!="white"){
 		  node.style("stroke", function(o) {
-                if (neighboring(d, o)) {
+                if (neighboring(d, o) || neighboring(o,d)) {
                     return highlight_color;}});
 			text.style("font-weight", function(o) {
-                return neighboring(d, o) ? "bold" : "normal";});
+                return (neighboring(d, o)||neighboring(o,d)) ? "bold" : "normal";});
             link.style("stroke", function(o) {
 		      return o.source.index == d.index || o.target.index == d.index ? highlight_color : colorScale(o.value)})
             }}
@@ -272,8 +272,8 @@ optArray = optArray.sort();
 $(function () {
     $("#search2").select2({
   data: optArray,
-  placeholder: "Select a state",
-  allowClear: true
+  placeholder: "Select a node",
+  //allowClear: true
 })});
 
     
@@ -393,3 +393,25 @@ function searchNode() {
             .style("opacity", 1);
     }
 }
+
+$("#ex6").bootstrapSlider();
+$("#ex6").on("slide", function(slideEvt) {
+    $("#ex6SliderVal").text(slideEvt.value);
+});
+
+
+var r = $('#score').bootstrapSlider()
+    .on('slideStop', function(ev){
+    var value = r.getValue();
+        if(value >= 1 && value <= 5){
+            $('.slider-selection').css('background', 'red');
+        }
+        else if(value > 5 && value <= 8) {
+            $('.slider-selection').css('background', 'orange');
+        }
+        else if(value > 8 && value <= 10) {
+            $('.slider-selection').css('background', 'green');
+        }
+        $('#lbl').val = value;
+    })
+    .data('slider');

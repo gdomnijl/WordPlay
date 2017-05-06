@@ -4,18 +4,21 @@
 <head>
     <meta charset="utf-8">
     <style type="text/css">
-      .graph-svg-component {
-      background-color: AliceBlue;
+    .graph-svg-component {
+        background-color: AliceBlue;
     }
+
     </style>
     <title>Word Play Visualization</title>
     <link rel="stylesheet" type="text/css" href="lab.css">
-        <!-- Adding libraries for search box -->
+    <!-- Adding libraries for search box -->
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.0/bootstrap-slider.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.0/css/bootstrap-slider.min.css" rel="stylesheet" type="text/css" />
     <link href="select2.min.css" rel="stylesheet" />
-<script src="select2.min.js"></script>
+    <script src="select2.min.js"></script>
 </head>
 </script>
 <script src="https://d3js.org/d3-color.v1.min.js"></script>
@@ -24,11 +27,32 @@
 <body>
     <h1>Word Play Visualization</h1>
     <div>
-    <label for="search2"> <b><i> Search for a specific node </i></b>
-    <select id="search2"><option selected="selected" disabled="disabled"></option> </select>
-    <button type="button" onclick="searchNode()">Search</button> </label>
+        <label for="search2"> <b><i> Search for a specific node </i></b>
+            <select id="search2" style="width: 40%">
+                <option disabled="disabled"></option>
+            </select>
+            <button type="button" onclick="searchNode()">Search</button>
+        </label>
     </div>
-
+    <div>
+       <input id="ex6" type="text" data-slider-min="-5" data-slider-max="20" data-slider-step="1" data-slider-value="3"/>
+<span id="ex6CurrentSliderValLabel">Current Slider Value: <span id="ex6SliderVal">3</span></span>
+    </div>
+    <div>
+    <input
+type="text"
+Id = "score"
+name="scoreSlide"
+data-provide="slider"
+data-slider-ticks="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]" 
+data-slider-ticks-labels='["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]' 
+data-slider-min="1"
+data-slider-max="10"
+data-slider-step="1"
+data-slider-value="3"
+data-slider-tooltip="hide"
+/>
+</div>
     <script type="text/javascript" src="mock_single_word.js"></script>
 </body>
 
