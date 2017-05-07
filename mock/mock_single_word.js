@@ -31,7 +31,6 @@ function randomWholeNum(diff,min) {
 //Max allowed is 9
 var NUM_NEIGHBOR = 9;
 
-
 //# 
 var MIN_SIM = 0;
 //future: var NUM_LAYERS = 10;
@@ -39,7 +38,7 @@ var MIN_SIM = 0;
 var nodes = []
 var nodeSet = new Set([]);
 var pairSet = new Set([]);
-var layer = new Map();
+var layerMap = new Map();
 //Map has all the source nodes as keys 
 var map = new Map();
 var links = []
@@ -69,11 +68,13 @@ function indexNodes(row){
 
 function addNodeToGraph(source, target, similarity, layer){
          if(!nodeSet.has(target)) {
-            nodes.push({"word": target,
-                      "layer": layer});    
+            nodes.push({"word": target});
+                     // "layer": layer});    
             nodeSet.add(target);
+             layerMap.set(target,layer);
         } else {
-        //    nodes.
+            var cur_layer = layerMap.get(target);
+            layerMap.set(target,Math.min(cur_layer,layer));
         }
          links.push({
          "source": source,
@@ -85,9 +86,10 @@ function addToGraph(root){
    
     //Root:
     if(!nodeSet.has(root)) { 
-            nodes.push({"word": root,
-                       "layer": 0});
+            nodes.push({"word": root});
+                      // "layer": 0});
             nodeSet.add(root);
+        layerMap.set(root,0);
         }
     //First layers:
     for (var i = 0; i < NUM_NEIGHBOR + 1; i++) {
@@ -167,14 +169,13 @@ d3.queue()
        console.log(map);
        addToGraph(centralWord);   
     //****has to be after indexNodes finish
-    var firstLayer = map.get(centralWord);
-    layer.set(centralWord,0);
+    //layer.set(centralWord,0);
    /* for(each of firstLayer){
           assignLayer(each,1);
     }*/
       
-        console.log("layers: (all unique nodes) " + layer.size);
-        console.log(layer);
+        console.log("layers: (all unique nodes) " + layerMap.size);
+        console.log(layerMap);
     console.log("node: (unique nodes after filtering) " + nodes.length);
 
     console.log(nodes);
@@ -250,7 +251,7 @@ var linkScale = d3.scaleLog()
                 .attr("id", d => d.word)
     //Arbitrarily setting node of size 10
                 .attr("r", 10)
-                .attr("fill", d => groupColorScale(d.layer))
+                .attr("fill", d => groupColorScale(layerMap.get(d.word)))
                    // if(d.word == centralWord){ return "black"; } 
                     //else {return colorScale(maxVal);}})
                     .call(d3.drag()
@@ -330,10 +331,6 @@ function exit_highlight(){
 			
 	}
 }
- 
-
-
-
 
     ////////Searchbox
 var optArray = [];
@@ -349,32 +346,6 @@ $(function () {
   //allowClear: true
 })});
 
-    
-/* Not working
-//**********Feature B: expel nodes beyond threshold
-    //adjust threshold
-
-function threshold(thresh) {
-    links.splice(0, links.length);
-
-		for (var i = 0; i < links.length; i++) {
-			if (links[i].value > thresh) {links.push(links[i]);}
-		}
-    restart();
-}
-
-
-//Restart the visualisation after any node and link changes
-
-function restart() {
-	
-	link = link.data(links);
-	link.exit().remove();
-	link.enter().insert("line", ".node").attr("class", "link");
-	node = node.data(nodes);
-	node.enter().insert("circle", ".cursor").attr("class", "node").attr("r", 5).call(force.drag);
-	force.start();
-}*/
 
 //**********Feature A: highlight 
 
@@ -468,11 +439,29 @@ function searchNode() {
             .style("opacity", 1);
     }
 }
+//*************** Restart
+function restart() {
 
+  // Apply the general update pattern to the nodes.
+  node = node.data(nodes, function(d) { return d.id;});
+  node.exit().remove();
+  node = node.enter().append("circle").attr("fill", function(d) { return color(d.id); }).attr("r", 8).merge(node);
+
+  // Apply the general update pattern to the links.
+  link = link.data(links, function(d) { return d.source.id + "-" + d.target.id; });
+  link.exit().remove();
+  link = link.enter().append("line").merge(link);
+
+  // Update and restart the simulation.
+  simulation.nodes(nodes);
+  simulation.force("link").links(links);
+  simulation.alpha(1).restart();
+}
 //*************** For sliders
 $("#ex6").bootstrapSlider();
 $("#score").on("slide", function(slideEvt) {
     $("#ex6SliderVal").text(slideEvt.value);
+    restart();
 });
 
 //***************** For Zoom function
