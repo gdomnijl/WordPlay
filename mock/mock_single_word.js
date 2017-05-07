@@ -27,7 +27,8 @@ function randomWholeNum(diff,min) {
 
 //MACRO CONSTANTS:
 //# of neighboring nodes:
-var NUM_NEIGHBOR = 11;
+//Max allowed is 9
+var NUM_NEIGHBOR = 9;
 
 //# 
 var MIN_SIM = 0;
@@ -55,12 +56,12 @@ function indexNodes(row){
             map.set(row.Source, []);
         }
             var subnodes = map.get(row.Source);
-            subnodes.push(row.Target);
+            subnodes.push({"t":row.Target, "v":row.Similarity});
             map.set(row.Source, subnodes);              
         }
      }
 }
-
+/*
 function assignLayer(curWord,cur){
     if (cur >=3) {return 1;} else{
         //if never assigned a layer before assign now
@@ -98,6 +99,7 @@ function assignLayer(centralWord, cur){
     }
 }
 */
+/*
 function addToGraph(row){
      //check if the nodes already exist in the set
         //if not push in nodes array AND add to nodeSet
@@ -111,7 +113,7 @@ function addToGraph(row){
     //only add in subnodes within the threshold
     for (var i = 0; i < NUM_NEIGHBOR; i++) {
         var target = map.get(row.Source)[i];
-         if(!nodeSet.has(target)) {
+         if((!nodeSet.has(target)) && (nodeSet.has(row.Source))) {
             nodes.push({"word": target,
                       "layer": layer.get(row.Source)});    
             nodeSet.add(target);
@@ -122,8 +124,73 @@ function addToGraph(row){
          "target": target, 
          "value": parseFloat(row.Similarity)});
         }
-   }
+   }*/
 
+function addNodeToGraph(source, target, similarity, layer){
+         if(!nodeSet.has(target)) {
+            nodes.push({"word": target,
+                      "layer": layer});    
+            nodeSet.add(target);
+             //targetSet.add(target);
+        }
+         links.push({
+         "source": source,
+         "target": target, 
+         "value": parseFloat(similarity)});
+}
+
+function addToGraph(root){
+   
+    //Root:
+    if(!nodeSet.has(root)) { 
+            nodes.push({"word": root,
+                       "layer": 0});
+            nodeSet.add(root);
+        }
+    //First layers:
+    for (var i = 0; i < NUM_NEIGHBOR + 1; i++) {
+    
+        var firstee = map.get(root)[i];
+        console.log("i: " +i);
+        console.log(firstee); 
+   
+        addNodeToGraph(root,firstee.t,firstee.v,1);
+        
+    //Second layers:
+    for (var j = 0; j < NUM_NEIGHBOR; j++) {
+         
+            var secondee = map.get(firstee.t)[j]
+           //console.log("j:" + j);
+        //    console.log(secondee);
+        if((j == 0) && (secondee.t == root)) {
+            var sub2 = map.get(firstee.t)[j+2];
+           
+         addNodeToGraph(firstee.t,sub2.t,sub2.v,2);
+       
+        } else { 
+    addNodeToGraph(firstee.t,secondee.t,secondee.v,2);
+            
+            
+        //Third layers:
+        for (var k = 0; k < NUM_NEIGHBOR; k++) {
+          
+            var thirdee = map.get(secondee.t)[k]
+            //console.log("k: " +k);
+            //console.log(thirdee);
+            
+        if((k == 0) && (thirdee.t == firstee.t)) {
+            var sub3 = map.get(secondee.t)[k+2];
+          addNodeToGraph(secondee.t,sub3.t,sub3.v,3);
+           
+        } else { 
+    addNodeToGraph(secondee.t,thirdee.t,thirdee.v,3);
+         
+        }
+        }
+        }
+    }
+   }
+}
 
 d3.queue()
 .defer(d3.json, 'maddie.json')
@@ -150,18 +217,19 @@ d3.queue()
           indexNodes(row);
        
         //Make sure the central word always show
-        //  subnodeMap.set(centralWord, 0);
-                 addToGraph(row);   
+        //  subnodeMap.set(centralWord, 0);         
 
     }
-    
+     console.log("the grand map")
+       console.log(map);
+       addToGraph(centralWord);   
     //****has to be after indexNodes finish
     var firstLayer = map.get(centralWord);
     layer.set(centralWord,0);
-    for(each of firstLayer){
+   /* for(each of firstLayer){
           assignLayer(each,1);
-    }
-       
+    }*/
+      
         console.log("layers: (all unique nodes) " + layer.size);
         console.log(layer);
     console.log("node: (unique nodes after filtering) " + nodes.length);
@@ -201,9 +269,10 @@ d3.queue()
 var sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
                     .range([2,8]);
-     var linkScale = d3.scaleLog()
+    
+var linkScale = d3.scaleLog()
                     .domain([minVal,maxVal])
-                    .range([0.3,6]);               
+                    .range([0.3,3]);               
    
     //Step 3: Set up link and node
     var link = svg.append("g")
