@@ -1,11 +1,11 @@
-var svg_width  = window.innerWidth;
+var svg_width  = 3/4 * window.innerWidth;
 var svg_height = 4/5 * window.innerHeight;
 
-var svg = d3.select('body').append('svg')
+var svg = d3.select('#svg').append('svg')
             .attr('width', svg_width)
             .attr('height', svg_height)
             .attr("class", "graph-svg-component");
-
+var g = svg.append("g");
 var manyBody = d3.forceManyBody()
                  .strength(-500);
 
@@ -27,8 +27,10 @@ function randomWholeNum(diff,min) {
 
 //MACRO CONSTANTS:
 //# of neighboring nodes:
+
 //Max allowed is 9
 var NUM_NEIGHBOR = 9;
+
 
 //# 
 var MIN_SIM = 0;
@@ -45,7 +47,8 @@ var links = []
 var focus_node = null;
 var highlight_node = null;
 var highlight_color = "#66D7D1";//#29b6f6";//"blue";
-var default_link_color = "#888";
+var default_link_color = "#A8A6B3";
+var transform = d3.zoomIdentity;
 
 function indexNodes(row){
     if(row.Similarity >= MIN_SIM) {
@@ -86,6 +89,7 @@ function assignLayer(curWord,cur){
 }
     
 
+
 /*
 function assignLayer(centralWord, cur){
     if (cur >= 3) {return;} else{
@@ -99,32 +103,7 @@ function assignLayer(centralWord, cur){
     }
 }
 */
-/*
-function addToGraph(row){
-     //check if the nodes already exist in the set
-        //if not push in nodes array AND add to nodeSet
-        
-    if(!nodeSet.has(row.Source)) {
-            
-            nodes.push({"word": row.Source,
-                       "layer": layer.get(row.Source)});     
-            nodeSet.add(row.Source);
-        }
-    //only add in subnodes within the threshold
-    for (var i = 0; i < NUM_NEIGHBOR; i++) {
-        var target = map.get(row.Source)[i];
-         if((!nodeSet.has(target)) && (nodeSet.has(row.Source))) {
-            nodes.push({"word": target,
-                      "layer": layer.get(row.Source)});    
-            nodeSet.add(target);
-             //targetSet.add(target);
-        }
-         links.push({
-         "source": row.Source,
-         "target": target, 
-         "value": parseFloat(row.Similarity)});
-        }
-   }*/
+
 
 function addNodeToGraph(source, target, similarity, layer){
          if(!nodeSet.has(target)) {
@@ -189,6 +168,7 @@ function addToGraph(root){
         }
         }
     }
+
    }
 }
 
@@ -216,7 +196,7 @@ d3.queue()
     
           indexNodes(row);
        
-        //Make sure the central word always show
+      
         //  subnodeMap.set(centralWord, 0);         
 
     }
@@ -233,6 +213,7 @@ d3.queue()
         console.log("layers: (all unique nodes) " + layer.size);
         console.log(layer);
     console.log("node: (unique nodes after filtering) " + nodes.length);
+
     console.log(nodes);
     //console.log("entries for maddie: ")
     //console.log(map.get("maddie"));
@@ -256,11 +237,19 @@ d3.queue()
     var maxVal = Math.max(...values);
     var minVal = Math.min(...values);
     console.log(maxVal,minVal); 
+    /*var colorScale = d3.scaleLinear()
+                    .domain([Math.max(minVal, MIN_SIM), maxVal])
+                    //.range(["#88EEC2","#00193D"]);
+                    //.range(["#A2BDDF", "#00234D"]);
+                     //.range(["#A8A6B3", "#0C0C10"]);
+                     .range(["#A8F989", "#DA7B57"]);*/
+
     var colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
 
                     //.range(["#88EEC2","#00193D"]);
                     //.range(["#A2BDDF", "#00234D"]);
+
                      .range(["#A8A6B3", "#0C0C10"]);
  var groupColorScale = d3.scaleOrdinal()
                             .domain([0,1,2,3])
@@ -272,20 +261,25 @@ var sizeScale = d3.scaleLog()
     
 var linkScale = d3.scaleLog()
                     .domain([minVal,maxVal])
+         
+
                     .range([0.3,3]);               
    
+   console.log("number of nodes")
+        console.log(nodes.length);
     //Step 3: Set up link and node
-    var link = svg.append("g")
+    var link = svg.select("g")
+            .append("g")
             .attr("class", "links")
             .selectAll("line")
             .data(links)
             .enter().append("line")
     //The more similar the words are, the thicker the links
             .attr("stroke-width", d => linkScale(d.value))
-            .attr("stroke", d => colorScale(d.value)); 
-
+            .attr("stroke", "#A8A6B3");//d => colorScale(d.value));
 	
-     var node = svg.selectAll(".node")
+     var node = svg.select("g")
+                .selectAll(".node")
                 .data(nodes)
                 .enter().append("g")
                 .attr("class", "nodes")
@@ -358,7 +352,7 @@ var linkScale = d3.scaleLog()
 			text.style("font-weight", function(o) {
                 return (neighboring(d, o)||neighboring(o,d)) ? "bold" : "normal";});
             link.style("stroke", function(o) {
-		      return o.source.index == d.index || o.target.index == d.index ? highlight_color : colorScale(o.value)})
+		      return o.source.index == d.index || o.target.index == d.index ? highlight_color : "#A8A6B3"})
             }}
 
 function exit_highlight(){
@@ -368,7 +362,7 @@ function exit_highlight(){
 		if (highlight_color!="white"){
   	       node.style("stroke", "white");
 	       text.style("font-weight", "normal");
-	       link.style("stroke", function(o) {return (/*isNumber(o.Similarity) && */ o.value>=0)?colorScale(o.value):default_link_color});
+	       link.style("stroke", function(o) {return (/*isNumber(o.Similarity) && */ o.value>=0)?"#A8A6B3":default_link_color});
         }
 			
 	}
@@ -388,7 +382,7 @@ optArray = optArray.sort();
 $(function () {
     $("#search2").select2({
   data: optArray,
-  placeholder: "Select a node",
+  //placeholder: "Select a node",
   //allowClear: true
 })});
 
@@ -445,6 +439,7 @@ function restart() {
     function connectedNodes() {
 
         if (toggle == 0) {
+
             //Reduce the opacity of all but the neighbouring nodes
             d = d3.select(this).node().__data__;
             node.style("opacity", function (o) {
@@ -477,6 +472,7 @@ function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
   d.fx = d.x;
   d.fy = d.y;
+
 }
 
 function dragged(d) {
@@ -510,24 +506,21 @@ function searchNode() {
     }
 }
 
+//*************** For sliders
 $("#ex6").bootstrapSlider();
-$("#ex6").on("slide", function(slideEvt) {
+$("#score").on("slide", function(slideEvt) {
     $("#ex6SliderVal").text(slideEvt.value);
 });
 
+//***************** For Zoom function
 
-var r = $('#score').bootstrapSlider()
-    .on('slideStop', function(ev){
-    var value = r.getValue();
-        if(value >= 1 && value <= 5){
-            $('.slider-selection').css('background', 'red');
-        }
-        else if(value > 5 && value <= 8) {
-            $('.slider-selection').css('background', 'orange');
-        }
-        else if(value > 8 && value <= 10) {
-            $('.slider-selection').css('background', 'green');
-        }
-        $('#lbl').val = value;
-    })
-    .data('slider');
+
+svg.call(d3.zoom()
+    .scaleExtent([1 / 2, 8])
+    .on("zoom", zoomed));
+
+function zoomed() {
+  g.attr("transform", d3.event.transform);
+}
+
+
