@@ -27,96 +27,156 @@ function randomWholeNum(diff,min) {
 
 //MACRO CONSTANTS:
 //# of neighboring nodes:
-var NUM_NEIGHBOR = 10;
+
+//Max allowed is 9
+var NUM_NEIGHBOR = 9;
+
 
 //# 
-var MIN_SIM = 0.3;
+var MIN_SIM = 0;
 //future: var NUM_LAYERS = 10;
 
 var nodes = []
 var nodeSet = new Set([]);
 var pairSet = new Set([]);
-var subnodeMap = new Map();
-var parentMap = new Map();
-var layers = [[]];
+var layer = new Map();
+//Map has all the source nodes as keys 
+var map = new Map();
 var links = []
+
 var focus_node = null;
 var highlight_node = null;
 var highlight_color = "#66D7D1";//#29b6f6";//"blue";
 var default_link_color = "#A8A6B3";
 var transform = d3.zoomIdentity;
 
-function indexNodes(data, index){
-    if(data[index].Similarity >= MIN_SIM) {
-        var pair = (data[index].Source+data[index].Target);
+function indexNodes(row){
+    if(row.Similarity >= MIN_SIM) {
+        var pair = (row.Source+row.Target);
         if(!pairSet.has(pair)) {
             pairSet.add(pair);
-        
-            
-        if(!parentMap.has(data[index].Source)) {
-            parentMap.set(data[index].Source, 0);
+        if(!map.has(row.Source)) {
+            map.set(row.Source, []);
         }
-        //Adding only Target node in subnodeMap 
-        //and logging the position they are at 
-        //**if no, add in the Target node as the first node
-        if(!subnodeMap.has(data[index].Target)) {
-            subnodeMap.set(data[index].Target, 1);
-            var numNodes = parentMap.get(data[index].Source);
-            parentMap.set(data[index].Source, numNodes + 1);        
-        } else {
-        //**if yes, increment current index and add in its position
-            var numNodes = parentMap.get(data[index].Source);
-            parentMap.set(data[index].Source, numNodes + 1);
-            
-           // var previndex = subnodeMap.get(data[index].Target);
-          //  var curindex = Math.min(previndex, numNodes + 1)
-            subnodeMap.set(data[index].Target, numNodes + 1);
-           // console.log("hit same target");
-          //console.log(index);
-        }  
-}
-}
-}
-
-function addToGraph(data,index){
-   
-    /*if(subnodeMap.get(data[index].Target) <= NUM_NEIGHBOR && 
-       subnodeMap.get(data[index].Source) <= NUM_NEIGHBOR){
-       //check if the nodes already exist in the set
-        //if not push in nodes array AND add to nodeSet
-        if(!nodeSet.has(data[index].Source)) {
-            nodes.push({"word": data[index].Source,
-                        "id": nodeSet.size});
-            var cur = nodeSet.size;
-            nodeSet.add(data[index].Source);
-            layers.push(cur);
-        }*/
-
-
-        if(!nodeSet.has(data[index].Target)) {
-            nodes.push({"word": data[index].Target,
-                       "id": nodeSet.size});
-            var cur = nodeSet.size;
-            nodeSet.add(data[index].Target);
-            var cur2 = layers.length;
-           // layers[cur2].push(cur);
+            var subnodes = map.get(row.Source);
+            subnodes.push({"t":row.Target, "v":row.Similarity});
+            map.set(row.Source, subnodes);              
         }
-       
-    links.push({
-         "source": data[index].Source,
-         "target": data[index].Target, 
-         "value": parseFloat(data[index].Similarity)});
-        
+     }
+}
+/*
+function assignLayer(curWord,cur){
+    if (cur >=3) {return 1;} else{
+        //if never assigned a layer before assign now
+    if(!layer.has(curWord)){
+    layer.set(curWord, cur);
     }
-    //}
+        //then recursively assign layer for its subnodes            
+        if(map.has(curWord)) {
+    var nextLayer = map.get(curWord);
+    for (each of nextLayer){
+        if(!layer.has(each)){
+            //set layer for subnodes in next layers excluding parentWord
+            var next = cur + 1;
+            console.log(curWord + " to " + each);
+            console.log(next);
+        layer.set(each, next);
+        assignLayer(each,next);
+        }
+    }
+        }
+    }
+}
+    
 
 
+/*
+function assignLayer(centralWord, cur){
+    if (cur >= 3) {return;} else{
+        
+    layer.set(centralWord, cur);
+    var first = map.get(centralWord);
+    for (each of first){
+        layer.set(each, cur+1);
+        assignLayer(each,cur+1)
+    }
+    }
+}
+*/
+
+
+function addNodeToGraph(source, target, similarity, layer){
+         if(!nodeSet.has(target)) {
+            nodes.push({"word": target,
+                      "layer": layer});    
+            nodeSet.add(target);
+             //targetSet.add(target);
+        }
+         links.push({
+         "source": source,
+         "target": target, 
+         "value": parseFloat(similarity)});
+}
+
+function addToGraph(root){
+   
+    //Root:
+    if(!nodeSet.has(root)) { 
+            nodes.push({"word": root,
+                       "layer": 0});
+            nodeSet.add(root);
+        }
+    //First layers:
+    for (var i = 0; i < NUM_NEIGHBOR + 1; i++) {
+    
+        var firstee = map.get(root)[i];
+        console.log("i: " +i);
+        console.log(firstee); 
+   
+        addNodeToGraph(root,firstee.t,firstee.v,1);
+        
+    //Second layers:
+    for (var j = 0; j < NUM_NEIGHBOR; j++) {
+         
+            var secondee = map.get(firstee.t)[j]
+           //console.log("j:" + j);
+        //    console.log(secondee);
+        if((j == 0) && (secondee.t == root)) {
+            var sub2 = map.get(firstee.t)[j+2];
+           
+         addNodeToGraph(firstee.t,sub2.t,sub2.v,2);
+       
+        } else { 
+    addNodeToGraph(firstee.t,secondee.t,secondee.v,2);
+            
+            
+        //Third layers:
+        for (var k = 0; k < NUM_NEIGHBOR; k++) {
+          
+            var thirdee = map.get(secondee.t)[k]
+            //console.log("k: " +k);
+            //console.log(thirdee);
+            
+        if((k == 0) && (thirdee.t == firstee.t)) {
+            var sub3 = map.get(secondee.t)[k+2];
+          addNodeToGraph(secondee.t,sub3.t,sub3.v,3);
+           
+        } else { 
+    addNodeToGraph(secondee.t,thirdee.t,thirdee.v,3);
+         
+        }
+        }
+        }
+    }
+
+   }
+}
 
 d3.queue()
 .defer(d3.json, 'maddie.json')
 .await(function(error,data){
 
-    console.log(data);
+    //console.log(data);
     //Step 0: Record the first entry as the central word
     var centralWord = data[0].Source;
     
@@ -132,24 +192,42 @@ d3.queue()
     //console.log(data);
     
     //Step 2: Select which data rows to put into graph
-    for(var i = 0; i < data.length; i ++) {
+    for(row of data) {
     
-          indexNodes(data,i);
-        //Make sure the central word always show
-          subnodeMap.set(centralWord, 0);
-          addToGraph(data,i);
+          indexNodes(row);
+       
+      
+        //  subnodeMap.set(centralWord, 0);         
 
-
-   
     }
+     console.log("the grand map")
+       console.log(map);
+       addToGraph(centralWord);   
+    //****has to be after indexNodes finish
+    var firstLayer = map.get(centralWord);
+    layer.set(centralWord,0);
+   /* for(each of firstLayer){
+          assignLayer(each,1);
+    }*/
+      
+        console.log("layers: (all unique nodes) " + layer.size);
+        console.log(layer);
+    console.log("node: (unique nodes after filtering) " + nodes.length);
 
-
-    console.log("subnodeMap:");
-    console.log(subnodeMap);
-    console.log("parentMap:");
-    console.log(parentMap);
-    console.log("node");
     console.log(nodes);
+    //console.log("entries for maddie: ")
+    //console.log(map.get("maddie"));
+   /* console.log("total JSON entries " + data.length);
+      console.log("total pairSet entries: " + pairSet.size);
+    console.log("links in graph: " + links.length);
+    
+  
+    
+    console.log("nodeSet: (unique nodes after filtering) " + nodeSet.size);
+    console.log(nodeSet);
+    console.log("map: (all souce nodes) " +map.size);
+    console.log(map);*/
+ 
     //Step 3: After nodes/links are filled in
     //Set up colorScale and sizeScale according to the max and min
     
@@ -168,19 +246,24 @@ d3.queue()
 
     var colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
+
                     //.range(["#88EEC2","#00193D"]);
                     //.range(["#A2BDDF", "#00234D"]);
-                     //.range(["#A8A6B3", "#0C0C10"]);
-                     .range(["#A8F989", "#DA7B57"]);
-    var sizeScale = d3.scaleLog()
+
+                     .range(["#A8A6B3", "#0C0C10"]);
+ var groupColorScale = d3.scaleOrdinal()
+                            .domain([0,1,2,3])
+                            .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
+    
+var sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
                     .range([2,8]);
-     var linkScale = d3.scaleLog()
+    
+var linkScale = d3.scaleLog()
                     .domain([minVal,maxVal])
-                    .range([0.3,3]);
-   var opacityScale = d3.scaleLinear()
-                    .domain([minVal,maxVal])
-                    .range([0.2, 1]);           
+         
+
+                    .range([0.3,3]);               
    
    console.log("number of nodes")
         console.log(nodes.length);
@@ -204,9 +287,9 @@ d3.queue()
                 .attr("id", d => d.word)
     //Arbitrarily setting node of size 10
                 .attr("r", 10)
-                .attr("fill", function(d){
-                    if(d.word == centralWord){ return "black"; } 
-                    else {return "#FC7753";}}) //#ec407a";}})//"#FF9B71";}})
+                .attr("fill", d => groupColorScale(d.layer))
+                   // if(d.word == centralWord){ return "black"; } 
+                    //else {return colorScale(maxVal);}})
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
