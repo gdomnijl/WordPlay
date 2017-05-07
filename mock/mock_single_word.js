@@ -61,77 +61,15 @@ function indexNodes(row){
         }
      }
 }
-/*
-function assignLayer(curWord,cur){
-    if (cur >=3) {return 1;} else{
-        //if never assigned a layer before assign now
-    if(!layer.has(curWord)){
-    layer.set(curWord, cur);
-    }
-        //then recursively assign layer for its subnodes            
-        if(map.has(curWord)) {
-    var nextLayer = map.get(curWord);
-    for (each of nextLayer){
-        if(!layer.has(each)){
-            //set layer for subnodes in next layers excluding parentWord
-            var next = cur + 1;
-            console.log(curWord + " to " + each);
-            console.log(next);
-        layer.set(each, next);
-        assignLayer(each,next);
-        }
-    }
-        }
-    }
-}
-    
 
-/*
-function assignLayer(centralWord, cur){
-    if (cur >= 3) {return;} else{
-        
-    layer.set(centralWord, cur);
-    var first = map.get(centralWord);
-    for (each of first){
-        layer.set(each, cur+1);
-        assignLayer(each,cur+1)
-    }
-    }
-}
-*/
-/*
-function addToGraph(row){
-     //check if the nodes already exist in the set
-        //if not push in nodes array AND add to nodeSet
-        
-    if(!nodeSet.has(row.Source)) {
-            
-            nodes.push({"word": row.Source,
-                       "layer": layer.get(row.Source)});     
-            nodeSet.add(row.Source);
-        }
-    //only add in subnodes within the threshold
-    for (var i = 0; i < NUM_NEIGHBOR; i++) {
-        var target = map.get(row.Source)[i];
-         if((!nodeSet.has(target)) && (nodeSet.has(row.Source))) {
-            nodes.push({"word": target,
-                      "layer": layer.get(row.Source)});    
-            nodeSet.add(target);
-             //targetSet.add(target);
-        }
-         links.push({
-         "source": row.Source,
-         "target": target, 
-         "value": parseFloat(row.Similarity)});
-        }
-   }*/
 
 function addNodeToGraph(source, target, similarity, layer){
          if(!nodeSet.has(target)) {
             nodes.push({"word": target,
                       "layer": layer});    
             nodeSet.add(target);
-             //targetSet.add(target);
+        } else {
+        //    nodes.
         }
          links.push({
          "source": source,
