@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 def wordlayers(wordstr,model):
     assert type(wordstr) is str
-    if wordstr not in model.wv.vocab:
+    if wordstr not in model.wv.vocab.keys():
         return(-1)
     wordlist = model.most_similar(wordstr)
     df = pd.DataFrame(columns=['Source','Target','Similarity'])
