@@ -1,0 +1,6 @@
+
+var uniString = [u'menmuny', u'kotwal', u'henricii', u'thanin', u'henricia', u'minheim', u'neostylopyga', u'adhunik', u'queenzy', u'autolysate', u'kleinbodungen', u'khrami', u'achmat', u'bichenovii', u'johnsharp', u'khrama', u'celotex', u'amarant', u'thanis', u'wojtas', u'arh\xe2', u'achmad', u'\u65b9\u745e\u5a25', u'bolandra', u'ko\xe7ali', u'glcua', u'discoderoides', u'beathoavenz', u'flaminius', u'kampfhandlungen', u'dh\xf2nnchaidh', u'pandyan', u'ull\xe0', u'holleben', u'lightcast', u'prabandham', u'g\xfcines', u'rui\u0107', u'gerity', u'pandyas', u'pamvotida', u'ji\u0101ngsh\u0101n', u'vakulenchuk', u'qiongthela', u'flameouts', u'botocan', u'shumilov', u'nwfcu', u'trogolemur', u'swisscharts', u'pasyukov', u'\u0432\u0438\u0431\u0440\u0430\u043d\u0456', u'tikhonite', u'pasban', u'northsouth', u'haveyou', u'barbrick', u'guadagno', u'guadagni', u'nonhistorical', u'pranger', u'pironneau', u'discretionary', u'j\xe4tk\xe4j\xe4tk\xe4t', u'vaarik', u'shyatt', u'prangey', u'mildmays', u'fsob', u'patibulum', u'homoneurous', u'psone', u'psong', u'obscurations', u'prangen', u'subidivision', u'prangel', u'fsoe', u'chakhari', u'kfrr', u'repertoire', u'tieon', u'\u9999\u6e2f\u7248', u'wiligrad', u'bacarion', u'ahsns', u'moraic', u'helostomatidae', u'cawtheray', u'basmadjan', u'genshichi']
+for var s in uniString {
+	s.encode('UTF-8')
+	console.log(s)
+}
