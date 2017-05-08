@@ -5,9 +5,11 @@ var svg = d3.select('#svg').append('svg')
             .attr('width', svg_width)
             .attr('height', svg_height)
             .attr("class", "graph-svg-component");
+
 var g = svg.append("g");
 var manyBody = d3.forceManyBody()
                  .strength(-500);
+
 
 var simulation = d3.forceSimulation()
         .force("center", d3.forceCenter(svg_width/2, svg_height/2))
@@ -16,25 +18,19 @@ var simulation = d3.forceSimulation()
         .force("charge", manyBody)
         .force("y", d3.forceY(0))
         .force("x", d3.forceX(0));
+
+
+var values;
+var maxVal; 
+var minVal; 
+var colorScale;
+var groupColorScale;  
+var sizeScale;
     
-
-//random number generator 
-function randomWholeNum(diff,min) {
-    var randNum = Math.floor(Math.random() * diff) + min
-    console.log(randNum);
-    return randNum;
-}
-
-//MACRO CONSTANTS:
-//# of neighboring nodes:
-
-//Max allowed is 9
-var NUM_NEIGHBOR = 9;
-
-//# 
-var MIN_SIM = 0;
-//future: var NUM_LAYERS = 10;
-
+var linkScale;
+var node;
+var link;
+var text;
 var nodes = []
 var nodeSet = new Set([]);
 var pairSet = new Set([]);
@@ -43,6 +39,11 @@ var layerMap = new Map();
 var map = new Map();
 var links = []
 
+
+var toggle;
+//Create an array logging what is connected to what
+var linkedByIndex;
+
 var focus_node = null;
 var highlight_node = null;
 var highlight_color = "#66D7D1";//#29b6f6";//"blue";
@@ -50,7 +51,6 @@ var default_link_color = "#A8A6B3";
 var transform = d3.zoomIdentity;
 
 function indexNodes(row){
-    if(row.Similarity >= MIN_SIM) {
         var pair = (row.Source+row.Target);
         if(!pairSet.has(pair)) {
             pairSet.add(pair);
@@ -62,11 +62,9 @@ function indexNodes(row){
             map.set(row.Source, subnodes);              
         }
      }
-}
-
-
 
 function addNodeToGraph(source, target, similarity, layer){
+      if(similarity >= MIN_SIM) {
          if(!nodeSet.has(target)) {
             nodes.push({"word": target});
                      // "layer": layer});    
@@ -81,13 +79,22 @@ function addNodeToGraph(source, target, similarity, layer){
          "target": target, 
          "value": parseFloat(similarity)});
 }
+}
 
+//MACRO CONSTANTS:
+//# of neighboring nodes:
+//Max allowed is 9
+var NUM_NEIGHBOR = 9;
+
+var MIN_SIM = 0.5;
+//future: var NUM_LAYERS = 10;
+
+var centralWord;
 function addToGraph(root){
-   
+    console.log("addToGraph called");
     //Root:
     if(!nodeSet.has(root)) { 
             nodes.push({"word": root});
-                      // "layer": 0});
             nodeSet.add(root);
         layerMap.set(root,0);
         }
@@ -95,9 +102,10 @@ function addToGraph(root){
     for (var i = 0; i < NUM_NEIGHBOR + 1; i++) {
     
         var firstee = map.get(root)[i];
-        console.log("i: " +i);
-        console.log(firstee); 
    
+        //if the firstee is filtered out don't go further
+        if(firstee.v >= MIN_SIM) {
+            
         addNodeToGraph(root,firstee.t,firstee.v,1);
         
     //Second layers:
@@ -106,7 +114,8 @@ function addToGraph(root){
             var secondee = map.get(firstee.t)[j]
            //console.log("j:" + j);
         //    console.log(secondee);
-        if((j == 0) && (secondee.t == root)) {
+        if(secondee.v >= MIN_SIM) {
+            if((j == 0) && (secondee.t == root)) {
             var sub2 = map.get(firstee.t)[j+2];
            
          addNodeToGraph(firstee.t,sub2.t,sub2.v,2);
@@ -121,7 +130,6 @@ function addToGraph(root){
             var thirdee = map.get(secondee.t)[k]
             //console.log("k: " +k);
             //console.log(thirdee);
-            
         if((k == 0) && (thirdee.t == firstee.t)) {
             var sub3 = map.get(secondee.t)[k+2];
           addNodeToGraph(secondee.t,sub3.t,sub3.v,3);
@@ -133,127 +141,80 @@ function addToGraph(root){
         }
         }
     }
+    }
+        }
 
    }
+    console.log("after addToGraph: nodes");
+    console.log(nodes);
 }
 
 d3.queue()
-.defer(d3.json, 'maddie.json')
+.defer(d3.json, "maddie.json")
 .await(function(error,data){
 
-    //console.log(data);
+    
     //Step 0: Record the first entry as the central word
-    var centralWord = data[0].Source;
+    centralWord = data[0].Source;
     
-    //Step 1: Sort the entries alphabetically according to Source 
-    function compareStrings(a, b) {
-        return (a < b) ? -1 : (a > b) ? 1 : 0;
-    }
-    data.sort(function(a, b) {
-        return compareStrings(a.Source, b.Source);
-    })
-    //Check:
-    //console.log("sorted:");
-    //console.log(data);
-    
-    //Step 2: Select which data rows to put into graph
-    for(row of data) {
-    
+    //Step 1: Log every relation into map
+    for(row of data) {  
           indexNodes(row);
-       
-      
-        //  subnodeMap.set(centralWord, 0);         
-
     }
-     console.log("the grand map")
-       console.log(map);
+    //Step 2: Add nodes into graph
        addToGraph(centralWord);   
-    //****has to be after indexNodes finish
-    //layer.set(centralWord,0);
-   /* for(each of firstLayer){
-          assignLayer(each,1);
-    }*/
-      
-        console.log("layers: (all unique nodes) " + layerMap.size);
-        console.log(layerMap);
-    console.log("node: (unique nodes after filtering) " + nodes.length);
-
-    console.log(nodes);
-    //console.log("entries for maddie: ")
-    //console.log(map.get("maddie"));
-   /* console.log("total JSON entries " + data.length);
-      console.log("total pairSet entries: " + pairSet.size);
-    console.log("links in graph: " + links.length);
-    
-  
-    
-    console.log("nodeSet: (unique nodes after filtering) " + nodeSet.size);
-    console.log(nodeSet);
-    console.log("map: (all souce nodes) " +map.size);
-    console.log(map);*/
  
-    //Step 3: After nodes/links are filled in
-    //Set up colorScale and sizeScale according to the max and min
+    //Step 3: Set up colorScale and sizeScale according to the max and min
     
     //Extracting just the value arrays
-    var values = links.map(function(a) {return a.value;});
-   // console.log(values);
-    var maxVal = Math.max(...values);
-    var minVal = Math.min(...values);
+     values = links.map(function(a) {return a.value;});
+     maxVal = Math.max(...values);
+     minVal = Math.min(...values);
     console.log(maxVal,minVal); 
-    /*var colorScale = d3.scaleLinear()
-                    .domain([Math.max(minVal, MIN_SIM), maxVal])
-                    //.range(["#88EEC2","#00193D"]);
-                    //.range(["#A2BDDF", "#00234D"]);
-                     //.range(["#A8A6B3", "#0C0C10"]);
-                     .range(["#A8F989", "#DA7B57"]);*/
+  
 
-    var colorScale = d3.scaleLinear()
+     colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
-
                     //.range(["#88EEC2","#00193D"]);
                     //.range(["#A2BDDF", "#00234D"]);
 
                      .range(["#A8A6B3", "#0C0C10"]);
- var groupColorScale = d3.scaleOrdinal()
+    groupColorScale = d3.scaleOrdinal()
                             .domain([0,1,2,3])
                             .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
     
-var sizeScale = d3.scaleLog()
+    sizeScale = d3.scaleLog()
                     .domain([minVal,maxVal])
                     .range([2,8]);
     
-var linkScale = d3.scaleLog()
+    linkScale = d3.scaleLog()
                     .domain([minVal,maxVal])
-         
-
                     .range([0.3,3]);               
    
-   console.log("number of nodes")
+        console.log("number of nodes")
         console.log(nodes.length);
-    //Step 3: Set up link and node
-    var link = svg.select("g")
+    //Step 4: Set up link and node
+     link = svg.select("g")
             .append("g")
             .attr("class", "links")
             .selectAll("line")
             .data(links)
             .enter().append("line")
-    //The more similar the words are, the thicker the links
+            //The more similar the words are, the thicker the links
             .attr("stroke-width", d => linkScale(d.value))
             .attr("stroke", "#A8A6B3");//d => colorScale(d.value));
 	
-     var node = svg.select("g")
+      node = svg.select("g")
                 .selectAll(".node")
                 .data(nodes)
                 .enter().append("g")
                 .attr("class", "nodes")
                 .append("circle")
                 .attr("id", d => d.word)
-    //Arbitrarily setting node of size 10
+                //Arbitrarily setting node of size 10
                 .attr("r", 10)
                 .attr("fill", d => groupColorScale(layerMap.get(d.word)))
-                   // if(d.word == centralWord){ return "black"; } 
-                    //else {return colorScale(maxVal);}})
+                
                     .call(d3.drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
@@ -265,15 +226,15 @@ var linkScale = d3.scaleLog()
                     .on("mouseout", function(d){
                         exit_highlight();
                     })
-    
-    var text = svg.selectAll(".nodes")
-    .data(nodes)
-    .append("text")
-    .attr("dx",10)
-    .attr("dy", ".35em")
-    .text(function(d) { return d.word});
-    
 
+             text = svg.selectAll(".nodes")
+                        .data(nodes)
+                        .append("text")
+                        .attr("dx",10)
+                        .attr("dy", ".35em")
+                        .text(function(d) { return d.word});
+
+    //Step 5: build simulation
     simulation.nodes(nodes)
     .on("tick", ticked);
 
@@ -282,27 +243,89 @@ var linkScale = d3.scaleLog()
     //The more similar the words, the closer they are
     .distance(d => sizeScale(1-d.value));
     
-    
-    function ticked() {
-    link
-      .attr("x1", d => d.source.x )
-      .attr("y1", d => d.source.y )
-      .attr("x2", d => d.target.x )
-      .attr("y2", d => d.target.y );
+    //Toggle stores whether the highlighting is on
+ toggle = 0;
 
-    node
-      .attr("cx", d => d.x )
-      .attr("cy", d => d.y );
-        
-    ///// make the text moves with the node
-    d3.selectAll("text")
-      .attr("x", function (d) {
-        return d.x;})
-       .attr("y", function (d) {
-        return d.y;});      
-    }
+    //Create an array logging what is connected to what
+ linkedByIndex = [];
+    //Every node is linking to itself 
+    for (i = 0; i < nodes.length; i++) {
+        linkedByIndex[i + "," + i] = 1;
+    };
+
+    //Logging from links array
+    links.forEach(function (d) {
+        linkedByIndex[d.source.index + "," + d.target.index] = 1;
+    });
+
+
     
-    function set_highlight(d){
+    ////////Searchbox *** can we make it global? 
+var optArray = [];
+for (var i = 0; i < nodes.length - 1; i++) {
+    optArray.push(nodes[i].word);
+}
+optArray = optArray.sort();
+
+     var testArray = ["maddie"];
+
+      $(function() {
+                $("#search2").select2({
+                    data: optArray,
+                    //placeholder: "Select a node",
+                    //allowClear: true
+                })
+
+                $("#wordsearch").select2({
+                    data: testArray,
+                    //placeholder: "Select a node",
+                    //allowClear: true
+                })
+
+            });
+    
+    
+});
+
+   //This function looks up whether a pair are neighbours  
+function neighboring(a, b) {
+        return linkedByIndex[a.index + "," + b.index];
+}
+ function connectedNodes() {
+
+        if (toggle == 0) {
+
+            //Reduce the opacity of all but the neighbouring nodes
+            d = d3.select(this).node().__data__;
+            console.log("d: " );
+            console.log(d);
+            node.style("opacity", function (o) {
+               return neighboring(d, o) | neighboring(o, d) ? 1 : 0.05;
+                //return d.index==o.source.index | d.index==o.target.index ? 1 : 0.05;
+
+            });
+
+            link.style("opacity", function (o) {
+                return d.index==o.source.index | d.index==o.target.index ? 1 : 0.003;
+            });
+
+            text.style("opacity", function (o) {
+                //return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+
+            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
+            });
+            //Reduce the op
+            toggle = 1;
+        } else {
+            //Put them back to opacity=1
+            node.style("opacity", 1);
+            link.style("opacity", 1);
+             text.style("opacity", 1);
+            toggle = 0;
+        }
+    }
+  
+function set_highlight(d){
 	   svg.style("cursor","pointer");
 	   if (focus_node!==null){
            d = focus_node;
@@ -332,31 +355,77 @@ function exit_highlight(){
 	}
 }
 
-    ////////Searchbox
-var optArray = [];
-for (var i = 0; i < nodes.length - 1; i++) {
-    optArray.push(nodes[i].word);
-}
-optArray = optArray.sort();
-
-$(function () {
-    $("#search2").select2({
-  data: optArray,
-  //placeholder: "Select a node",
-  //allowClear: true
-})});
+    //*************** For sliders
+$("#ex6").bootstrapSlider();
+$("#score").on("slide", function(slideEvt) {
+    $("#ex6SliderVal").text(slideEvt.value);
+    console.log("slider update" + MIN_SIM);
+    MIN_SIM = slideEvt.value;
+});
 
 
-//**********Feature A: highlight 
 
-    //Toggle stores whether the highlighting is on
-    var toggle = 0;
+function ticked() {
+    link
+      .attr("x1", d => d.source.x )
+      .attr("y1", d => d.source.y )
+      .attr("x2", d => d.target.x )
+      .attr("y2", d => d.target.y );
 
-    //Create an array logging what is connected to what
-    var linkedByIndex = {};
+    node
+      .attr("cx", d => d.x )
+      .attr("cy", d => d.y );
+        
+    ///// make the text moves with the node
+    d3.selectAll("text")
+      .attr("x", function (d) {
+        return d.x;})
+       .attr("y", function (d) {
+        return d.y;});      
+    }
+function updateData() {
+    nodes = [];
+    links = [];
+    nodeSet.clear();
+    addToGraph(centralWord);
+    console.log(centralWord);
+    console.log("nodes");
+    console.log(nodes);
+    console.log("links");
+    console.log(links);
+    
+      //Extracting just the value arrays
+     values = links.map(function(a) {return a.value;});
+   // console.log(values);
+     maxVal = Math.max(...values);
+     minVal = Math.min(...values);
+    console.log(maxVal,minVal); 
+  
+//updating scales:
+     colorScale = d3.scaleLinear()
+                    .domain([Math.max(minVal, MIN_SIM), maxVal])
+                    //.range(["#88EEC2","#00193D"]);
+                    //.range(["#A2BDDF", "#00234D"]);
 
-    //Every node is linking to itself 
-    for (i = 0; i < nodes.length; i++) {
+                     .range(["#A8A6B3", "#0C0C10"]);
+  groupColorScale = d3.scaleOrdinal()
+                            .domain([0,1,2,3])
+                            .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
+    
+ sizeScale = d3.scaleLog()
+                    .domain([minVal,maxVal])
+                    .range([2,8]);
+    
+ linkScale = d3.scaleLog()
+                    .domain([minVal,maxVal])
+                    .range([0.3,3]);  
+    
+    
+      
+    //updating array of linkedByIndex
+    linkedByIndex = [];
+    
+      for (i = 0; i < nodes.length; i++) {
         linkedByIndex[i + "," + i] = 1;
     };
 
@@ -365,42 +434,72 @@ $(function () {
         linkedByIndex[d.source.index + "," + d.target.index] = 1;
     });
 
-    //This function looks up whether a pair are neighbours  
-    function neighboring(a, b) {
-        return linkedByIndex[a.index + "," + b.index];
-    }
+}
+function restart() {
+    updateData();
+console.log(MIN_SIM);
+    console.log(NUM_NEIGHBOR);
+    d3.selectAll('svg').remove();
+    
+   svg = d3.select('#svg').append('svg')
+            .attr('width', svg_width)
+            .attr('height', svg_height)
+            .attr("class", "graph-svg-component"); 
+   g = svg.append("g")
+    //Arbitrarily setting node of size 10
+    
+          
+    link = svg.select("g")
+                .append("g")
+                .attr("class", "links")
+                .selectAll("line")
+                .data(links)
+                .enter().append("line")
+                //The more similar the words are, the thicker the links
+    //*****Arbitrarily
+                .attr("stroke-width", d => linkScale(d.value))
+                .attr("stroke", "#A8A6B3"); //d => colorScale(d.value));
 
-    function connectedNodes() {
+            node = svg.select("g")
+                .selectAll(".node")
+                .data(nodes)
+                .enter().append("g")
+                .attr("class", "nodes")
+                .append("circle")
+                .attr("id", d => d.word)
+                //Arbitrarily setting node of size 10
+                .attr("r", 10)
+                .attr("fill", d => groupColorScale(layerMap.get(d.word)))
+                // if(d.word == centralWord){ return "black"; } 
+                //else {return colorScale(maxVal);}})
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended))
+                .on("click", connectedNodes)
+                .on("mouseover", function(d) {
+                    set_highlight(d);
+                })
+                .on("mouseout", function(d) {
+                    exit_highlight();
+                })
 
-        if (toggle == 0) {
+            var text = svg.selectAll(".nodes")
+                .data(nodes)
+                .append("text")
+                .attr("dx", 10)
+                .attr("dy", ".35em")
+                .text(function(d) {
+                    return d.word
+                });
 
-            //Reduce the opacity of all but the neighbouring nodes
-            d = d3.select(this).node().__data__;
-            node.style("opacity", function (o) {
-                return neighboring(d, o) | neighboring(o, d) ? 1 : 0.05;
-            });
-
-            link.style("opacity", function (o) {
-                return d.index==o.source.index | d.index==o.target.index ? 1 : 0.003;
-            });
-
-            text.style("opacity", function (o) {
-            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
-});
-            //Reduce the op
-
-            toggle = 1;
-        } else {
-            //Put them back to opacity=1
-            node.style("opacity", 1);
-            link.style("opacity", 1);
-             text.style("opacity", 1);
-            toggle = 0;
-        }
-
-    }
-    })
-
+  // Update and restart the simulation.
+  simulation.nodes(nodes)
+  .on("tick",ticked);
+  simulation.force("link").links(links);
+  simulation.alpha(1).restart();
+    
+}
 
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
@@ -439,30 +538,8 @@ function searchNode() {
             .style("opacity", 1);
     }
 }
-//*************** Restart
-function restart() {
 
-  // Apply the general update pattern to the nodes.
-  node = node.data(nodes, function(d) { return d.id;});
-  node.exit().remove();
-  node = node.enter().append("circle").attr("fill", function(d) { return color(d.id); }).attr("r", 8).merge(node);
 
-  // Apply the general update pattern to the links.
-  link = link.data(links, function(d) { return d.source.id + "-" + d.target.id; });
-  link.exit().remove();
-  link = link.enter().append("line").merge(link);
-
-  // Update and restart the simulation.
-  simulation.nodes(nodes);
-  simulation.force("link").links(links);
-  simulation.alpha(1).restart();
-}
-//*************** For sliders
-$("#ex6").bootstrapSlider();
-$("#score").on("slide", function(slideEvt) {
-    $("#ex6SliderVal").text(slideEvt.value);
-    restart();
-});
 
 //***************** For Zoom function
 
