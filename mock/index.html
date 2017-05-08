@@ -14,9 +14,8 @@
         background-color: #F3F0EB;
     }
     
-    .margin-top-bot{
-      margin-top: 1%;
-      margin-bottom: 1%;
+    .margin-top-bot {
+        margin-top: 0.5%;
     }
     </style>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -33,23 +32,34 @@
 
 <body>
     <div class="container">
-    <div class="page-header">
-        <h1>Word Play Visualization</h1>
-    </div class="margin-top-bot">
-        <label for="search2" class="lead"> <b><i> Search for a specific node </i></b>
+        <div class="page-header">
+            <h1>Word Play Visualization</h1>
+        </div class="margin-top-bot">
+
+    <div class="margin-top-bot">
+        <label for="wordsearch" class="lead">
+            Choose a word to be the first node
+           <select type="text" id="wordsearch" style="width: 40%">
+            <option disabled="disabled"></option>
+        </select>
+            <button class="btn btn-default btn-info" type="button" onclick="searchWord()">Search</button>
         </label>
+</div>
+        <label for="search2" class="lead"> Search for a node in the graph
         <select id="search2" style="width: 40%">
             <option disabled="disabled"></option>
         </select>
-        <button class="btn btn-default btn-lg btn-info" type="button" onclick="searchNode()">Search</button>
-    <div class="margin-top-bot">
-        <input id="ex6" type="text" data-slider-min="-5" data-slider-max="20" data-slider-step="1" data-slider-value="3" />
-        <span id="ex6CurrentSliderValLabel">Current Slider Value: <span id="ex6SliderVal">0.5</span></span>
-    </div>
-    <div class="margin-top-bot">
-        <input style="width: 50%" type="text" Id="score" name="scoreSlide" data-provide="slider" data-slider-ticks="[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,1]" data-slider-ticks-labels='["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9","1"]' data-slider-min="0" data-slider-max="1" data-slider-step="0.1" data-slider-value="0.5" data-slider-tooltip="hide" />
-    </div>
-    <div class="margin-top-bot" id="svg"> </div>
+        <button class="btn btn-default btn-info" type="button" onclick="searchNode(svg)">Search</button>
+        </label>
+
+        <div class="margin-top-bot">
+            <input id="ex6" type="text" data-slider-min="-5" data-slider-max="20" data-slider-step="1" data-slider-value="3" />
+            <span id="ex6CurrentSliderValLabel">Current Slider Value: <span id="ex6SliderVal">0.5</span></span>
+        </div>
+        <div class="margin-top-bot">
+            <input style="width: 50%" type="text" Id="score" name="scoreSlide" data-provide="slider" data-slider-ticks="[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,1]" data-slider-ticks-labels='["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9","1"]' data-slider-min="0" data-slider-max="1" data-slider-step="0.1" data-slider-value="0.5" data-slider-tooltip="hide" />
+        </div>
+        <div class="margin-top-bot" id="svg"> </div>
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
