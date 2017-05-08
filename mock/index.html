@@ -17,6 +17,21 @@
     .margin-top-bot {
         margin-top: 0.5%;
     }
+    
+    .margin-bot {
+        margin-bottom: 0.5%;
+    }
+    
+    .margin-left {
+        margin-left: 5px;
+    }
+    .slider {
+    width: 60% !important;
+    }
+
+    #neighbor.slider-selection {
+    background: #BABABA;
+}
     </style>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -35,31 +50,60 @@
         <div class="page-header">
             <h1>Word Play Visualization</h1>
         </div class="margin-top-bot">
-
-    <div class="margin-top-bot">
-        <label for="wordsearch" class="lead">
-            Choose a word to be the first node
-           <select type="text" id="wordsearch" style="width: 40%">
-            <option disabled="disabled"></option>
-        </select>
-            <button class="btn btn-default btn-info" type="button" onclick="searchWord()">Search</button>
-        </label>
-</div>
-        <label for="search2" class="lead"> Search for a node in the graph
-        <select id="search2" style="width: 40%">
-            <option disabled="disabled"></option>
-        </select>
-        <button class="btn btn-default btn-info" type="button" onclick="searchNode(svg)">Search</button>
-        </label>
-
         <div class="margin-top-bot">
-            <input id="ex6" type="text" data-slider-min="-5" data-slider-max="20" data-slider-step="1" data-slider-value="3" />
-            <span id="ex6CurrentSliderValLabel">Current Slider Value: <span id="ex6SliderVal">0.5</span></span>
+            <label for="wordsearch" class="lead">
+                Choose a word to be the first node
+                <select type="text" id="wordsearch" style="width: 40%">
+                    <option disabled="disabled"></option>
+                </select>
+                <button class="btn btn-default btn-info" type="button" onclick="searchWord()">Search</button>
+            </label>
+        </div class="margin-top-bot">
+        <div>
+            <label for="search2" class="lead"> Search for a node in the graph
+                <select id="search2" style="width: 40%">
+                    <option disabled="disabled"></option>
+                </select>
+                <button class="btn btn-default btn-info" type="button" onclick="searchNode(svg)">Search</button>
+            </label>
         </div>
+
         <div class="margin-top-bot">
-            <input style="width: 50%" type="text" Id="score" name="scoreSlide" data-provide="slider" data-slider-ticks="[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,1]" data-slider-ticks-labels='["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9","1"]' data-slider-min="0" data-slider-max="1" data-slider-step="0.1" data-slider-value="0.5" data-slider-tooltip="hide" />
+            <label for="num_subnodes" class="lead"> Number of similar words
+            
+            
+            </label>
+
+            <div class="margin-left">
+                
+                 <input style="width: 50%" type="text" Id="num_subnodes" name="scoreSlide" data-provide="slider" data-slider-ticks="[1,  2, 3, 4, 5, 6, 7, 8, 9]" data-slider-ticks-labels='["1", "2", "3", "4", "5", "6", "7", "8", "9"]' data-slider-min="1" data-slider-max="9" data-slider-step="1" data-slider-value="9" data-slider-tooltip="hide" />
+
+            </div>
+        </div>
+
+        <div class="margin-top-bot">
+            <label for="score" class="lead"> Set similarity threshold
+            </label>
+            <div class="margin-left">
+                <input style="width: 50%" type="text" Id="score" name="scoreSlide" data-provide="slider" data-slider-ticks="[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,1]" data-slider-ticks-labels='["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9","1"]' data-slider-min="0" data-slider-max="1" data-slider-step="0.1" data-slider-value="0.5" data-slider-tooltip="hide" />
+            </div>
+        </div>
+        <div class="margin-top-bot margin-bot">
+            <button class="btn btn-lg btn-primary margin-left margin-top-bot" type="button" onclick="restart()">Restart Visualization</button>
         </div>
         <div class="margin-top-bot" id="svg"> </div>
+        
+        <!-- Progress bar -->
+        <!-- <div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-header">
+                <h1>Processing...</h1>
+            </div>
+            <div class="modal-body">
+                <div class="progress progress-striped active">
+                    <div class="bar" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div> -->
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

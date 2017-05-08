@@ -18,7 +18,7 @@ def wordlayers(wordstr,model):
             if layer2[0] != wordstr:
                 df.loc[count] = np.array([layer1[0],layer2[0],str(layer2[1])])
                 count += 1
-                if (layer2[0] not in words) and (layer2[0] not in words1):
+                if (layer2[0] not in words) and (layer2[0] not in [x for x in words1 if x != layer2[0]]):
                     wordlist2 = model.most_similar(layer2[0])
                     for layer3 in wordlist2:
                         if layer3[0] != layer1[0]:
