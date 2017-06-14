@@ -10,7 +10,7 @@
     <!-- Bootstrap -->
     <link href="bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
-    .graph-svg-component {
+      .graph-svg-component {
         background-color: #F3F0EB;
     }
     
@@ -18,9 +18,21 @@
         margin-top: 0.5%;
     }
     
-        .margin-left{
-            margin-left: 0.5%;
-        }
+    .margin-bot {
+        margin-bottom: 0.5%;
+    }
+    
+    .margin-left {
+        margin-left: 5px;
+    }
+    .slider {
+    width: 60% !important;
+    }
+
+    #neighbor.slider-selection {
+    background: #BABABA;
+    }
+
     </style>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -35,39 +47,56 @@
 </head>
 
 <body>
+
+
     <div class="container">
         <div class="page-header">
             <h1>Word Play Visualization</h1>
         </div class="margin-top-bot">
 
+<!--search for a central node-->
     <div class="margin-top-bot">
         <label for="wordsearch" class="lead">
-            Choose a word to be the first node
+            Choose a word of interest
            <select type="text" id="wordsearch" style="width: 40%">
             <option disabled="disabled"></option>
         </select>
             <button class="btn btn-default btn-info" type="button" onclick="searchWord()">Search</button>
         </label>
-</div>
+    </div>
+
+<!--search within that graph-->
+    <div class = "margin-top-bot">
         <label for="search2" class="lead"> Search for a node in the graph
         <select id="search2" style="width: 40%">
             <option disabled="disabled"></option>
         </select>
         <button class="btn btn-default btn-info" type="button" onclick="searchNode()">Search</button>
         </label>
+    </div>
+
+<!--number of neighbors-->
+        <div class="margin-top-bot">
+        <label for="numNeighbors" class="lead">
+                Number of neighboring nodes
+        </label>
+         <input style="width: 100%" type="text" Id="numNeighbors" name="scoreSlide" data-provide="slider" data-slider-ticks="[1, 2, 3, 4, 5, 6, 7, 8, 9]" data-slider-ticks-labels='["1", "2", "3", "4", "5", "6", "7", "8", "9"]' data-slider-min="1" data-slider-max="9" data-slider-step="1" data-slider-value="9" data-slider-tooltip="hide" />
+ 
+        </div>
+
+<!--minimum similarity scores-->
 
         <div class="margin-top-bot">
-            <input id="ex6" type="text" data-slider-min="-5" data-slider-max="20" data-slider-step="1" data-slider-value="3" />
-            <span id="ex6CurrentSliderValLabel">Current Slider Value: <span id="ex6SliderVal">0.5</span></span>
-        </div>
-        <div class="margin-top-bot">
+        <label for="score" class="lead">
+                Minimum similarity score 
+                 </label>
             <input style="width: 50%" type="text" Id="score" name="scoreSlide" data-provide="slider" data-slider-ticks="[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,1]" data-slider-ticks-labels='["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9","1"]' data-slider-min="0" data-slider-max="1" data-slider-step="0.1" data-slider-value="0.5" data-slider-tooltip="hide" />
-            
         </div>
         
         <button class="btn btn-default btn-info margin-left margin-top-bot" type="button" onclick="restart()">Restart Visualization</button>
         <div class="margin-top-bot" id="svg"> </div>
     </div>
+
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->

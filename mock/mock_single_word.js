@@ -19,6 +19,7 @@ var simulation = d3.forceSimulation()
         .force("y", d3.forceY(0))
         .force("x", d3.forceX(0));
 
+var sampleArray = ["maddie"];
 
 var values;
 var maxVal; 
@@ -145,8 +146,6 @@ function addToGraph(root){
         }
 
    }
-    console.log("after addToGraph: nodes");
-    console.log(nodes);
 }
 
 d3.queue()
@@ -170,15 +169,12 @@ d3.queue()
      values = links.map(function(a) {return a.value;});
      maxVal = Math.max(...values);
      minVal = Math.min(...values);
-    console.log(maxVal,minVal); 
   
 
      colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
-                    //.range(["#88EEC2","#00193D"]);
-                    //.range(["#A2BDDF", "#00234D"]);
-
-                     .range(["#A8A6B3", "#0C0C10"]);
+                    .range(["#A8A6B3", "#0C0C10"]);
+   
     groupColorScale = d3.scaleOrdinal()
                             .domain([0,1,2,3])
                             .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
@@ -191,8 +187,6 @@ d3.queue()
                     .domain([minVal,maxVal])
                     .range([0.3,3]);               
    
-        console.log("number of nodes")
-        console.log(nodes.length);
     //Step 4: Set up link and node
      link = svg.select("g")
             .append("g")
@@ -261,23 +255,24 @@ d3.queue()
 
     
     ////////Searchbox *** can we make it global? 
-var optArray = [];
+var nodeInMap = [];
 for (var i = 0; i < nodes.length - 1; i++) {
-    optArray.push(nodes[i].word);
+    nodeInMap.push(nodes[i].word);
 }
-optArray = optArray.sort();
+nodeInMap = nodeInMap.sort();
 
-     var testArray = ["maddie"];
+     
 
       $(function() {
-                $("#search2").select2({
-                    data: optArray,
+
+                $("#wordsearch").select2({
+                    data: sampleArray,
                     //placeholder: "Select a node",
                     //allowClear: true
                 })
 
-                $("#wordsearch").select2({
-                    data: testArray,
+                 $("#search2").select2({
+                    data: nodeInMap,
                     //placeholder: "Select a node",
                     //allowClear: true
                 })
@@ -356,10 +351,13 @@ function exit_highlight(){
 }
 
     //*************** For sliders
-$("#ex6").bootstrapSlider();
+$("#numNeighbors").on("slide", function(slideEvt) {
+    $("#ex6SliderVal").text(slideEvt.value);
+    NUM_NEIGHBOR = slideEvt.value;
+});
+
 $("#score").on("slide", function(slideEvt) {
     $("#ex6SliderVal").text(slideEvt.value);
-    console.log("slider update" + MIN_SIM);
     MIN_SIM = slideEvt.value;
 });
 
@@ -383,16 +381,12 @@ function ticked() {
        .attr("y", function (d) {
         return d.y;});      
     }
+
 function updateData() {
     nodes = [];
     links = [];
     nodeSet.clear();
     addToGraph(centralWord);
-    console.log(centralWord);
-    console.log("nodes");
-    console.log(nodes);
-    console.log("links");
-    console.log(links);
     
       //Extracting just the value arrays
      values = links.map(function(a) {return a.value;});
@@ -404,10 +398,8 @@ function updateData() {
 //updating scales:
      colorScale = d3.scaleLinear()
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
-                    //.range(["#88EEC2","#00193D"]);
-                    //.range(["#A2BDDF", "#00234D"]);
+                    .range(["#A8A6B3", "#0C0C10"]);
 
-                     .range(["#A8A6B3", "#0C0C10"]);
   groupColorScale = d3.scaleOrdinal()
                             .domain([0,1,2,3])
                             .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
@@ -435,10 +427,9 @@ function updateData() {
     });
 
 }
+
 function restart() {
     updateData();
-console.log(MIN_SIM);
-    console.log(NUM_NEIGHBOR);
     d3.selectAll('svg').remove();
     
    svg = d3.select('#svg').append('svg')
