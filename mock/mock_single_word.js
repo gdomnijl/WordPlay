@@ -255,72 +255,72 @@ function restart() {
 
 
      //This function looks up whether a pair are neighbours  
-function neighboring(a, b) {
-        return linkedByIndex[a.index + "," + b.index];
-}
- function connectedNodes() {
-
-        if (toggle == 0) {
-
-            //Reduce the opacity of all but the neighbouring nodes
-            d = d3.select(this).node().__data__;
-            console.log("d: " );
-            console.log(d);
-            node.style("opacity", function (o) {
-               return neighboring(d, o) | neighboring(o, d) ? 1 : 0.05;
-                //return d.index==o.source.index | d.index==o.target.index ? 1 : 0.05;
-
-            });
-
-            link.style("opacity", function (o) {
-                return d.index==o.source.index | d.index==o.target.index ? 1 : 0.003;
-            });
-
-            text.style("opacity", function (o) {
-                //return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
-
-            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
-            });
-            //Reduce the op
-            toggle = 1;
-        } else {
-            //Put them back to opacity=1
-            node.style("opacity", 1);
-            link.style("opacity", 1);
-             text.style("opacity", 1);
-            toggle = 0;
-        }
+    function neighboring(a, b) {
+            return linkedByIndex[a.index + "," + b.index];
     }
-  
-function set_highlight(d){
-       svg.style("cursor","pointer");
-       if (focus_node!==null){
-           d = focus_node;
-       }
-            highlight_node = d;
+     function connectedNodes() {
 
-    if (highlight_color!="white"){
-          node.style("stroke", function(o) {
-                if (neighboring(d, o) || neighboring(o,d)) {
-                    return highlight_color;}});
-            text.style("font-weight", function(o) {
-                return (neighboring(d, o)||neighboring(o,d)) ? "bold" : "normal";});
-            link.style("stroke", function(o) {
-              return o.source.index == d.index || o.target.index == d.index ? highlight_color : "#A8A6B3"})
-            }}
+            if (toggle == 0) {
 
-function exit_highlight(){
-        highlight_node = null;
-    if (focus_node===null){
-        svg.style("cursor","move");
+                //Reduce the opacity of all but the neighbouring nodes
+                d = d3.select(this).node().__data__;
+                console.log("d: " );
+                console.log(d);
+                node.style("opacity", function (o) {
+                   return neighboring(d, o) | neighboring(o, d) ? 1 : 0.05;
+                    //return d.index==o.source.index | d.index==o.target.index ? 1 : 0.05;
+
+                });
+
+                link.style("opacity", function (o) {
+                    return d.index==o.source.index | d.index==o.target.index ? 1 : 0.003;
+                });
+
+                text.style("opacity", function (o) {
+                    //return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+
+                return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
+                });
+                //Reduce the op
+                toggle = 1;
+            } else {
+                //Put them back to opacity=1
+                node.style("opacity", 1);
+                link.style("opacity", 1);
+                 text.style("opacity", 1);
+                toggle = 0;
+            }
+        }
+      
+    function set_highlight(d){
+           svg.style("cursor","pointer");
+           if (focus_node!==null){
+               d = focus_node;
+           }
+                highlight_node = d;
+
         if (highlight_color!="white"){
-           node.style("stroke", "white");
-           text.style("font-weight", "normal");
-           link.style("stroke", function(o) {return (/*isNumber(o.Similarity) && */ o.value>=0)?"#A8A6B3":default_link_color});
+              node.style("stroke", function(o) {
+                    if (neighboring(d, o) || neighboring(o,d)) {
+                        return highlight_color;}});
+                text.style("font-weight", function(o) {
+                    return (neighboring(d, o)||neighboring(o,d)) ? "bold" : "normal";});
+                link.style("stroke", function(o) {
+                  return o.source.index == d.index || o.target.index == d.index ? highlight_color : "#A8A6B3"})
+                }}
+
+    function exit_highlight(){
+            highlight_node = null;
+        if (focus_node===null){
+            svg.style("cursor","move");
+            if (highlight_color!="white"){
+               node.style("stroke", "white");
+               text.style("font-weight", "normal");
+               link.style("stroke", function(o) {return (/*isNumber(o.Similarity) && */ o.value>=0)?"#A8A6B3":default_link_color});
+            }
+                
         }
-            
     }
-}
 
     //Toggle stores whether the highlighting is on
     toggle = 0;
@@ -340,9 +340,7 @@ function exit_highlight(){
 for (var i = 0; i < nodes.length - 1; i++) {
     nodeInMap.push(nodes[i].word);
 }
-nodeInMap = nodeInMap.sort();
-
-     
+    nodeInMap = nodeInMap.sort();
 
       $(function() {
 
@@ -351,7 +349,7 @@ nodeInMap = nodeInMap.sort();
                     //placeholder: "Select a node",
                     //allowClear: false
                 })
-
+//Need update
                  $("#search2").select2({
                     data: nodeInMap,
                     //placeholder: "Select a node",
@@ -359,6 +357,25 @@ nodeInMap = nodeInMap.sort();
                 })
 
             });
+
+      function searchNode() {
+    //find the node
+    var selectedVal = document.getElementById('search2').value;
+    var node = svg.selectAll(".nodes");
+    if (selectedVal == "none") {
+        node.style("stroke", "white").style("stroke-width", "1");
+    } else {
+        var selected = node.filter(function (d, i) {
+            return d.word != selectedVal;
+        });
+        selected.style("opacity", "0");
+        var link = svg.selectAll(".links")
+        link.style("opacity", "0");
+        d3.selectAll(".nodes, .links").transition()
+            .duration(5000)
+            .style("opacity", 1);
+    }
+}
 }
 
 
@@ -535,25 +552,7 @@ function dragended(d) {
   d.fy = null;
 }
 
-//**************For Searchbox
-function searchNode() {
-    //find the node
-    var selectedVal = document.getElementById('search2').value;
-    var node = svg.selectAll(".nodes");
-    if (selectedVal == "none") {
-        node.style("stroke", "white").style("stroke-width", "1");
-    } else {
-        var selected = node.filter(function (d, i) {
-            return d.word != selectedVal;
-        });
-        selected.style("opacity", "0");
-        var link = svg.selectAll(".links")
-        link.style("opacity", "0");
-        d3.selectAll(".nodes, .links").transition()
-            .duration(5000)
-            .style("opacity", 1);
-    }
-}
+
 
 
 
