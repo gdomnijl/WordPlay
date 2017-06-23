@@ -18,12 +18,9 @@ var simulation = d3.forceSimulation()
         .force("charge", manyBody);
   
 
-<<<<<<< HEAD:mock/mock_single_word.js
-var sampleArray = ["maddie", "communism", "refugee","psy","microsoft", "apple", "grinnell","iowa","seattle","syria"];
-=======
+
 var sampleArray = ["refugee","maddie", "communism", "psy","microsoft", "iowa",
 "grinnell", "seattle","apple","syria"];
->>>>>>> 4251b7f2ad4248ab4f6435d4ffef5eb0c89fb104:mock/wordPlay.js
 
 var values;
 var maxVal; 
@@ -347,51 +344,28 @@ function restart() {
     //Logging from links array
     links.forEach(d => linkedByIndex[d.source.index + "," + d.target.index] = 1 );
 
-<<<<<<< HEAD:mock/mock_single_word.js
-
-for (var i = 0; i < nodes.length - 1; i++) {
-    nodeInMap.push(nodes[i].word);
-}
-    nodeInMap = nodeInMap.sort();
-
-      $(function() {
-
-                $("#wordsearch").select2({
-                    data: sampleArray,
-                    //placeholder: "Select a node",
-                    //allowClear: false
-                })
-//Need update
-                 $("#search2").select2({
-                    data: nodeInMap,
-                    //placeholder: "Select a node",
-                    //allowClear: true
-                })
-
-            });
-
       function searchNode() {
-    //find the node
-    var selectedVal = document.getElementById('search2').value;
-    var node = svg.selectAll(".nodes");
-    if (selectedVal == "none") {
-        node.style("stroke", "white").style("stroke-width", "1");
-    } else {
-        var selected = node.filter(function (d, i) {
-            return d.word != selectedVal;
-        });
-        selected.style("opacity", "0");
-        var link = svg.selectAll(".links")
-        link.style("opacity", "0");
-        d3.selectAll(".nodes, .links").transition()
-            .duration(5000)
-            .style("opacity", 1);
-=======
+        //find the node
+        var selectedVal = document.getElementById('search2').value;
+        var node = svg.selectAll(".nodes");
+        if (selectedVal == "none") {
+            node.style("stroke", "white").style("stroke-width", "1");
+        } else {
+            var selected = node.filter(function (d, i) {
+                return d.word != selectedVal;
+            });
+            selected.style("opacity", "0");
+            var link = svg.selectAll(".links")
+            link.style("opacity", "0");
+            d3.selectAll(".nodes, .links").transition()
+                .duration(5000)
+                .style("opacity", 1);
+        }
+      }
     //For the drop-down list of nodes in the map 
     var nodeInMap = [];
     for (var i = 0; i < nodes.length - 1; i++) {
         nodeInMap.push(nodes[i].word);
->>>>>>> 4251b7f2ad4248ab4f6435d4ffef5eb0c89fb104:mock/wordPlay.js
     }
     nodeInMap = nodeInMap.sort();
      
