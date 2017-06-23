@@ -14,12 +14,16 @@ var manyBody = d3.forceManyBody()
 var simulation = d3.forceSimulation()
         .force("center", d3.forceCenter(svg_width/2, svg_height/2))
         .force("link", d3.forceLink().id(d => d.word))
-        .force("collide", d3.forceCollide(30).strength(0.2))//.iterations(16))
-        .force("charge", manyBody)
-        .force("y", d3.forceY(0))
-        .force("x", d3.forceX(0));
+        .force("collide", d3.forceCollide(35).strength(0.3))//.iterations(16))
+        .force("charge", manyBody);
+  
 
+<<<<<<< HEAD:mock/mock_single_word.js
 var sampleArray = ["maddie", "communism", "refugee","psy","microsoft", "apple", "grinnell","iowa","seattle","syria"];
+=======
+var sampleArray = ["refugee","maddie", "communism", "psy","microsoft", "iowa",
+"grinnell", "seattle","apple","syria"];
+>>>>>>> 4251b7f2ad4248ab4f6435d4ffef5eb0c89fb104:mock/wordPlay.js
 
 var values;
 var maxVal; 
@@ -146,6 +150,7 @@ function addToGraph(root){
     }
 }
 
+// Update the filtered data after hitting "restart visualization" 
 function updateData() {
     nodes.length = 0;
     links.length = 0;
@@ -154,7 +159,6 @@ function updateData() {
     
     //Extracting just the value arrays
      values = links.map(function(a) {return a.value;});
-   // console.log(values);
      maxVal = Math.max(...values);
      minVal = Math.min(...values);
   
@@ -163,19 +167,21 @@ function updateData() {
                     .domain([Math.max(minVal, MIN_SIM), maxVal])
                     .range(["#A8A6B3", "#0C0C10"]);
 
-  groupColorScale = d3.scaleOrdinal()
-                            .domain([0,1,2,3])
-                            .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
-    
- sizeScale = d3.scaleLog()
-                    .domain([minVal,maxVal])
-                    .range([2,8]);
-    
- linkScale = d3.scaleLog()
-                    .domain([minVal,maxVal])
-                    .range([0.3,3]);  
+      groupColorScale = d3.scaleOrdinal()
+                                .domain([0,1,2,3])
+                                .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
+        
+     sizeScale = d3.scaleLog()
+                        .domain([minVal,maxVal])
+                        .range([2,15]);
+        
+     linkScale = d3.scaleLog()
+                        .domain([minVal,maxVal])
+                        .range([0.3,3]);  
 }
 
+// Restart function draws a new force graph using the updated data
+// It also updates the node search drop down list
 function restart() {
     
     updateData();
@@ -206,7 +212,7 @@ function restart() {
                 .append("circle")
                 .attr("id", d => d.word)
                 //Arbitrarily setting node of size 10
-                .attr("r", 10)
+                .attr("r", d => (layerMap.get(d.word) == 0) ? 13  : 10)
                 .attr("fill", d => groupColorScale(layerMap.get(d.word)))
                 .call(d3.drag()
                     .on("start", dragstarted)
@@ -236,6 +242,8 @@ function restart() {
     
     simulation.alpha(1).restart();
 
+
+    //Step 6: force graph animation
     function ticked() {
         link
       .attr("x1", d => d.source.x )
@@ -255,20 +263,20 @@ function restart() {
         return d.y;});      
     }
 
-
-
-     //This function looks up whether a pair are neighbours  
+    // **************** Helper functions for highlight features 
+    //Note: they need to be in this restart function
+    //This function looks up whether a pair are neighbours  
     function neighboring(a, b) {
             return linkedByIndex[a.index + "," + b.index];
     }
-     function connectedNodes() {
+     
+    function connectedNodes() {
 
             if (toggle == 0) {
 
                 //Reduce the opacity of all but the neighbouring nodes
                 d = d3.select(this).node().__data__;
-                console.log("d: " );
-                console.log(d);
+           
                 node.style("opacity", function (o) {
                    return neighboring(d, o) | neighboring(o, d) ? 1 : 0.05;
                     //return d.index==o.source.index | d.index==o.target.index ? 1 : 0.05;
@@ -293,16 +301,16 @@ function restart() {
                  text.style("opacity", 1);
                 toggle = 0;
             }
-        }
+    }
       
     function set_highlight(d){
            svg.style("cursor","pointer");
            if (focus_node!==null){
                d = focus_node;
            }
-                highlight_node = d;
+            highlight_node = d;
 
-        if (highlight_color!="white"){
+            if (highlight_color!="white"){
               node.style("stroke", function(o) {
                     if (neighboring(d, o) || neighboring(o,d)) {
                         return highlight_color;}});
@@ -310,10 +318,11 @@ function restart() {
                     return (neighboring(d, o)||neighboring(o,d)) ? "bold" : "normal";});
                 link.style("stroke", function(o) {
                   return o.source.index == d.index || o.target.index == d.index ? highlight_color : "#A8A6B3"})
-                }}
+                }
+    }
 
     function exit_highlight(){
-            highlight_node = null;
+        highlight_node = null;
         if (focus_node===null){
             svg.style("cursor","move");
             if (highlight_color!="white"){
@@ -338,6 +347,7 @@ function restart() {
     //Logging from links array
     links.forEach(d => linkedByIndex[d.source.index + "," + d.target.index] = 1 );
 
+<<<<<<< HEAD:mock/mock_single_word.js
 
 for (var i = 0; i < nodes.length - 1; i++) {
     nodeInMap.push(nodes[i].word);
@@ -376,14 +386,39 @@ for (var i = 0; i < nodes.length - 1; i++) {
         d3.selectAll(".nodes, .links").transition()
             .duration(5000)
             .style("opacity", 1);
+=======
+    //For the drop-down list of nodes in the map 
+    var nodeInMap = [];
+    for (var i = 0; i < nodes.length - 1; i++) {
+        nodeInMap.push(nodes[i].word);
+>>>>>>> 4251b7f2ad4248ab4f6435d4ffef5eb0c89fb104:mock/wordPlay.js
     }
+    nodeInMap = nodeInMap.sort();
+     
+     //Building drop-down for both centralword search and node search 
+  $(function() {
+
+            $("#wordsearch").select2({
+                data: sampleArray,
+                //placeholder: "Select a node",
+                //allowClear: false
+            })
+             $("#search2").empty().select2({
+                data: nodeInMap,
+                //placeholder: "Select a node",
+                //allowClear: true
+            })
+        }); 
+
+     // For Zoom function
+  svg.call(d3.zoom()
+    .scaleExtent([1 / 2, 8])
+    .on("zoom", zoomed));
 }
-}
 
-
-
+//*************** Default central word "refugee"
 d3.queue()
-.defer(d3.json, "communism.json")
+.defer(d3.json, "data/refugee.json")
 .await(function(error,data){
     
     //Step 0: Record the first entry as the central word
@@ -396,130 +431,49 @@ d3.queue()
     restart();
 })
 
-//problems:
-//var central_selected = e.options[e.selectedIndex].value;
-
+//************** When a new central word is selected 
 function searchWord(){
     var central_selected= document.getElementById('wordsearch').value;
 
-d3.queue()
-.defer(d3.json, central_selected + ".json")
-.await(function(error,data){
-    
-    //Step 0: Record the first entry as the central word
-    centralWord = central_selected;
-    //data[0].Source;
-    
-    //Step 1: Log every relation into map
-    for(row of data) {  
-          indexNodes(row);
-    }
-    restart();
-})
+    d3.queue()
+    .defer(d3.json, "data/" + central_selected + ".json")
+    .await(function(error,data){
+        
+        //Step 0: Record the first entry as the central word
+        centralWord = central_selected;
+        //data[0].Source;
+        
+        //Step 1: Log every relation into map
+        for(row of data) {  
+              indexNodes(row);
+        }
+        restart();
+    })
 }
-    
-   /* //Step 2: Add nodes into graph
-       addToGraph(centralWord);   
- 
-    //Step 3: Set up colorScale and sizeScale according to the max and min
-    
-    //Extracting just the value arrays
-     values = links.map(function(a) {return a.value;});
-     maxVal = Math.max(...values);
-     minVal = Math.min(...values);
-  
 
-     colorScale = d3.scaleLinear()
-                    .domain([Math.max(minVal, MIN_SIM), maxVal])
-                    .range(["#A8A6B3", "#0C0C10"]);
-   
-    groupColorScale = d3.scaleOrdinal()
-                            .domain([0,1,2,3])
-                            .range(["#b30000","#e34a33", "#fc8d59", "#fdcc8a"]);
-    
-    sizeScale = d3.scaleLog()
-                    .domain([minVal,maxVal])
-                    .range([2,8]);
-    
-    linkScale = d3.scaleLog()
-                    .domain([minVal,maxVal])
-                    .range([0.3,3]);               
-   
-    //Step 4: Set up link and node
-     link = svg.select("g")
-            .append("g")
-            .attr("class", "links")
-            .selectAll("line")
-            .data(links)
-            .enter().append("line")
-            //The more similar the words are, the thicker the links
-            .attr("stroke-width", d => linkScale(d.value))
-            .attr("stroke", "#A8A6B3");//d => colorScale(d.value));
-	
-      node = svg.select("g")
-                .selectAll(".node")
-                .data(nodes)
-                .enter().append("g")
-                .attr("class", "nodes")
-                .append("circle")
-                .attr("id", d => d.word)
-                //Arbitrarily setting node of size 10
-                .attr("r", 10)
-                .attr("fill", d => groupColorScale(layerMap.get(d.word)))
-                
-                    .call(d3.drag()
-                    .on("start", dragstarted)
-                    .on("drag", dragged)
-                    .on("end", dragended))
-                    .on("click",connectedNodes)
-                    .on("mouseover", function(d){
-                        set_highlight(d);
-                    })
-                    .on("mouseout", function(d){
-                        exit_highlight();
-                    })
+//************* Functions that can be global:
+//For search a node in the graph
+function searchNode() {
+        //find the node
+        var selectedVal = document.getElementById('search2').value;
+        var node = svg.selectAll(".nodes");
+        if (selectedVal == "none") {
+            node.style("stroke", "white").style("stroke-width", "1");
+        } else {
+            var selected = node.filter(function (d, i) {
+                return d.word != selectedVal;
+            });
+            selected.style("opacity", "0");
+            var link = svg.selectAll(".links")
+            link.style("opacity", "0");
+            d3.selectAll(".nodes, .links").transition()
+                .duration(5000)
+                .style("opacity", 1);
+        }
+    }
 
-             text = svg.selectAll(".nodes")
-                        .data(nodes)
-                        .append("text")
-                        .attr("dx",10)
-                        .attr("dy", ".35em")
-                        .text(function(d) { return d.word});
+//*************** For sliders
 
-    //Step 5: build simulation
-    simulation.nodes(nodes)
-    .on("tick", ticked);
-
-    simulation.force("link")
-    .links(links)
-    //The more similar the words, the closer they are
-    .distance(d => sizeScale(1-d.value));
-    
-    //Toggle stores whether the highlighting is on
- toggle = 0;
-
-    //Create an array logging what is connected to what
- linkedByIndex = [];
-    //Every node is linking to itself 
-    for (i = 0; i < nodes.length; i++) {
-        linkedByIndex[i + "," + i] = 1;
-    };
-
-    //Logging from links array
-    links.forEach(function (d) {
-        linkedByIndex[d.source.index + "," + d.target.index] = 1;
-    }); 
-
-*/
-
-/*-----------------*/
-
-    //});
-    
-
-  
-
-    //*************** For sliders
 $("#numNeighbors").on("slide", function(slideEvt) {
     $("#ex6SliderVal").text(slideEvt.value);
     NUM_NEIGHBOR = slideEvt.value;
@@ -535,6 +489,7 @@ $("#numLayers").on("slide", function(slideEvt) {
     NUM_LAYERS = slideEvt.value;
 });
 
+//********* Force graph basic functions
 
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
@@ -554,16 +509,7 @@ function dragended(d) {
   d.fy = null;
 }
 
-
-
-
-
-//***************** For Zoom function
-
-
-svg.call(d3.zoom()
-    .scaleExtent([1 / 2, 8])
-    .on("zoom", zoomed));
+//******* define a zoom function
 
 function zoomed() {
   g.attr("transform", d3.event.transform);
