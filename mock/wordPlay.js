@@ -101,7 +101,7 @@ function addToGraph(root){
         layerMap.set(root,0);
         }
     //First layers:
-    for (var i = 0; i < NUM_NEIGHBOR + 1; i++) {
+    for (var i = 0; i < NUM_NEIGHBOR; i++) {
     
         var firstee = map.get(root)[i];
    
