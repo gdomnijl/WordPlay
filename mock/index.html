@@ -49,9 +49,17 @@
             <i><h4>An Hoang, Minh N Tran, Jinlin He, Jun Taek Lee </h4>
             <h4>Charlie Curtsinger, PhD</i></h4>
             <br/>
-              <p>We built this visualization as the final project of <i>CSC ST395 Data Visualization</i> class. We applied a natural language processing model (Word2vec) on wikipedia corpus (as of 2017) which computes a similarity score between any two words in the vocabularies. </p>
+              <p>We built this visualization as the final project of <i>CSC ST395 Data Visualization</i> class. We applied a natural language processing model (Word2vec) on wikipedia corpus (as of March 20th 2017) which computes a similarity score between any two words in the vocabularies. </p>
               <p>This force graph translates the numerics between any two words into a network to better visualize the relationship amongst multiple words. While each node represents a word, each word connects to other words which share the most similar context. Several filter options are avaible to customize the visualization. For the purpose of this demo, we used 10 pre-generated word list. The actual model allows users to search for any word that appears in Wikipedia corpus. </p>
-              <p>We would like to thank the instructor of the course Professor Charlie Curtsinger and the classmates for their  support and feedback. We would also like to thank DASIL for displaying our work. If you have questions or suggestions, please reach out to us!</p>
+              <p>We would like to thank the instructor of the course Professor Charlie Curtsinger and the classmates for their  support and feedback. We would also like to thank DASIL for displaying our work. If you have questions or suggestions, please reach out to us! </p>
+
+   <p>
+An Hoang (hoangan@grinnell.edu)</br>
+Minh N Tran (tranminh@grinnell.edu)</br>
+Jinlin He (hejinlin@grinnell.edu)</br>
+Jun Taek Lee (leejunta@grinnell.edu)</p> 
+
+  <p, style="text-align: right"><b>Citation: </b></br> 1. Wikipedia Downloads at https://dumps.wikimedia.org/ </br> 2. gensim package at https://radimrehurek.com/gensim/index.html</br>3. Force graph https://bl.ocks.org/mbostock/4062045 </p>
         </div class="margin-top-bot">
 
 <!--search for a central node-->
@@ -59,8 +67,7 @@
         <label for="wordsearch" class="lead">
             Choose a word of interest
            <select type="text" id="wordsearch" style="width: 40%">
-                          <option disabled="disabled"></option>
-
+                <option disabled="disabled"></option>
             </select>
             <button class="btn btn-default btn-info" type="button" onclick="searchWord()">Search</button>
         </label>
@@ -115,7 +122,8 @@
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <!-- Include all compiled plugins (below), or include 
+    individual files as needed -->
     <script src="bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -124,6 +132,8 @@
     <script src="select2.min.js"></script>
     <script src="https://d3js.org/d3-color.v1.min.js"></script>
     <script type="text/javascript" src="wordPlay.js"></script>
+
 </body>
+
 
 </html>

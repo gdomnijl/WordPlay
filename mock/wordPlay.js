@@ -18,6 +18,7 @@ var simulation = d3.forceSimulation()
         .force("charge", manyBody);
   
 
+
 var sampleArray = ["refugee","maddie", "communism", "psy","microsoft", "iowa",
 "grinnell", "seattle","apple","syria"];
 
@@ -29,6 +30,9 @@ var groupColorScale;
 var sizeScale;
     
 var linkScale;
+
+    var nodeInMap = [];
+    
 var node;
 var link;
 var text;
@@ -340,6 +344,24 @@ function restart() {
     //Logging from links array
     links.forEach(d => linkedByIndex[d.source.index + "," + d.target.index] = 1 );
 
+      function searchNode() {
+        //find the node
+        var selectedVal = document.getElementById('search2').value;
+        var node = svg.selectAll(".nodes");
+        if (selectedVal == "none") {
+            node.style("stroke", "white").style("stroke-width", "1");
+        } else {
+            var selected = node.filter(function (d, i) {
+                return d.word != selectedVal;
+            });
+            selected.style("opacity", "0");
+            var link = svg.selectAll(".links")
+            link.style("opacity", "0");
+            d3.selectAll(".nodes, .links").transition()
+                .duration(5000)
+                .style("opacity", 1);
+        }
+      }
     //For the drop-down list of nodes in the map 
     var nodeInMap = [];
     for (var i = 0; i < nodes.length - 1; i++) {
