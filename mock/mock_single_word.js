@@ -19,7 +19,7 @@ var simulation = d3.forceSimulation()
         .force("y", d3.forceY(0))
         .force("x", d3.forceX(0));
 
-var sampleArray = ["maddie", "communism", "refugee","psy","microsoft"];
+var sampleArray = ["maddie", "communism", "refugee","psy","microsoft", "apple", "grinnell","iowa","seattle","syria"];
 
 var values;
 var maxVal; 
@@ -29,6 +29,9 @@ var groupColorScale;
 var sizeScale;
     
 var linkScale;
+
+    var nodeInMap = [];
+    
 var node;
 var link;
 var text;
@@ -336,7 +339,6 @@ function restart() {
     links.forEach(d => linkedByIndex[d.source.index + "," + d.target.index] = 1 );
 
 
-    var nodeInMap = [];
 for (var i = 0; i < nodes.length - 1; i++) {
     nodeInMap.push(nodes[i].word);
 }
